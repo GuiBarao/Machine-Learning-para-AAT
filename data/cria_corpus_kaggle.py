@@ -1,5 +1,11 @@
-from src.Texto import Texto
+import sys
+
+sys.path.insert(0, 'src')
+
+from Texto import Texto
 import pandas as pd
+
+caminho_corpus = 'data\corpus_fundamental.xml'
 
 def nova_escala(valor, min_original, max_original, min_novo, max_novo):
    return ((valor - min_original)/ (max_original - min_original)) * (max_novo - min_novo) + min_novo
@@ -74,7 +80,7 @@ def cvs_to_xml():
     instancias = corpus_sem_flags.apply(instancia_linha, axis=1)
     
     for texto in instancias:
-        texto.to_xml()
+        texto.to_xml(caminho_corpus)
     
 def main():
     cvs_to_xml()

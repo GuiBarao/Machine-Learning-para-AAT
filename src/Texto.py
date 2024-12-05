@@ -1,20 +1,14 @@
 import xml.etree.ElementTree as ET
 import nltk
-from src.Corretor import Corretor
+from Corretor import Corretor
 import pandas as pd
 import math
 import spacy
 
-#nltk.download('rslp')
-#nltk.download('averaged_perceptron_tagger_eng')
-
-#Atributos Extraídos:
-#numero de caracteres - numero de palavras - media do tamanho das palavras -
-#tamanho de palavras mais frequente - quantidade de diferentes PoS tags -
-#quantidade de alguma etiqueta -
 
 class Texto:
-    caminho_corpus = 'data/corpus.xml'
+    caminho_corpus_fundamental = 'data/corpus_fundamental.xml'
+    caminho_corpus_enem = 'data/corpus_enem.xml'
     idBase = 0
     ultimo_id = 1234
     media_palavras_corpus = 148.37165991902833
@@ -29,7 +23,8 @@ class Texto:
         Texto.idBase += 1
 
     #Transforma um objeto em xml e salva no arquivo corpus.xml
-    def to_xml(self):
+    def to_xml(self, caminho_corpus):
+
         texto = ET.Element('texto')
         redacao = ET.SubElement(texto, 'redacao')
         avaliacao = ET.SubElement(texto, 'avaliacao')
@@ -48,29 +43,36 @@ class Texto:
         atributos.text = string_atributos
         id.text = str(self.id)
         try:
-            abertura_XML = ET.parse(Texto.caminho_corpus)
+            abertura_XML = ET.parse(caminho_corpus)
             raiz = abertura_XML.getroot()
         except:
             raiz = ET.Element('corpus')
             abertura_XML = ET.ElementTree(raiz)
             
         raiz.append(texto)
-        abertura_XML.write(Texto.caminho_corpus, encoding='utf-8', xml_declaration=True)
+        abertura_XML.write(caminho_corpus, encoding='utf-8', xml_declaration=True)
 
     #Transforma um texto xml em um objeto.
     @classmethod
-    def xml_to_object(cls, id):
-        texto = Texto.buscar_texto(id)
+    def xml_to_object(cls, id, corpus):
+        if corpus == 'enem':
+            caminho = Texto.caminho_corpus_enem
+        elif corpus == 'fundamental':
+            caminho = Texto.caminho_corpus_fundamental
+        else:
+            exit()
+
+        texto = Texto.buscar_texto(id, caminho)
 
         if (texto):
-            return cls(texto.find('redacao').text, texto.find('id').text, texto.find('tipo').text)
+            return cls(texto.find('redacao').text, texto.find('avaliacao').text, texto.find('tipo').text)
         else:
             return False
 
     #Busca um texto xml pelo id e retorna a raiz.
     @staticmethod
-    def buscar_texto(id):
-        arvoreXML = ET.parse(Texto.caminho_corpus)
+    def buscar_texto(id, corpus):
+        arvoreXML = ET.parse(corpus)
         raiz = arvoreXML.getroot()
 
         for texto in raiz.findall('texto'):
