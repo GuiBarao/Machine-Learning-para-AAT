@@ -7,34 +7,50 @@ import spacy
 
 
 class Texto:
-    caminho_corpus_fundamental = 'data/corpus_fundamental.xml'
-    caminho_corpus_enem = 'data/corpus_enem.xml'
+    diretorio_corpus_kaggle = 'data/corpus_kaggle.xml'
+    diretorio_corpus_uol = 'data/corpus_uol.xml'
     idBase = 0
     ultimo_id = 1234
     media_palavras_corpus = 148.37165991902833
     pln = spacy.load("pt_core_news_lg")
 
-    def __init__(self, redacao, avaliacao, tipo):
+    def __init__(self, redacao, avaliacao, uso_AM, corpus):
         self.redacao = redacao
         self.avaliacao = avaliacao
-        self.tipo = tipo #Treino ou Teste
+        self.uso_AM = uso_AM #treino ou teste
+        self.corpus = corpus #uol ou kaggle
         self.atributos = {}
         self.id = Texto.idBase
         Texto.idBase += 1
 
+    @staticmethod
+    def diretorio_corpus(corpus):
+        if corpus == 'uol':
+            diretorio = Texto.diretorio_corpus_uol
+        elif corpus == 'kaggle':
+            diretorio = Texto.diretorio_corpus_kaggle
+        else:
+            exit()
+
+        return diretorio
+
     #Transforma um objeto em xml e salva no arquivo corpus.xml
-    def to_xml(self, caminho_corpus):
+    def to_xml(self):
+
+        caminho_corpus = Texto.diretorio_corpus(self.corpus)
 
         texto = ET.Element('texto')
         redacao = ET.SubElement(texto, 'redacao')
         avaliacao = ET.SubElement(texto, 'avaliacao')
-        tipo = ET.SubElement(texto, 'tipo')
+        uso_AM = ET.SubElement(texto, 'uso_AM')
+        corpus = ET.SubElement(texto, 'corpus')
         atributos = ET.SubElement(texto, 'atributos')
         id = ET.SubElement(texto, 'id')
 
         redacao.text = self.redacao
         avaliacao.text = str(self.avaliacao)
-        tipo.text = self.tipo
+        uso_AM.text = self.uso_AM
+        corpus.text = self.corpus
 
         string_atributos = ''
         for chave, valor in self.atributos.items():
@@ -46,7 +62,7 @@ class Texto:
             abertura_XML = ET.parse(caminho_corpus)
             raiz = abertura_XML.getroot()
         except:
-            raiz = ET.Element('corpus')
+            raiz = ET.Element('corpus_completo')
             abertura_XML = ET.ElementTree(raiz)
             
         raiz.append(texto)
@@ -55,24 +71,19 @@ class Texto:
     #Transforma um texto xml em um objeto.
     @classmethod
     def xml_to_object(cls, id, corpus):
-        if corpus == 'enem':
-            caminho = Texto.caminho_corpus_enem
-        elif corpus == 'fundamental':
-            caminho = Texto.caminho_corpus_fundamental
-        else:
-            exit()
-
-        texto = Texto.buscar_texto(id, caminho)
+        caminho_corpus = Texto.diretorio_corpus(corpus)
+        
+        texto = Texto.buscar_texto(id, caminho_corpus)
 
         if (texto):
-            return cls(texto.find('redacao').text, texto.find('avaliacao').text, texto.find('tipo').text)
+            return cls(texto.find('redacao').text, texto.find('avaliacao').text, texto.find('uso_AM').text, texto.find('corpus').text)
         else:
             return False
 
     #Busca um texto xml pelo id e retorna a raiz.
     @staticmethod
-    def buscar_texto(id, corpus):
-        arvoreXML = ET.parse(corpus)
+    def buscar_texto(id, caminho_corpus):
+        arvoreXML = ET.parse(caminho_corpus)
         raiz = arvoreXML.getroot()
 
         for texto in raiz.findall('texto'):
@@ -349,4 +360,3 @@ class Texto:
     def nPosse(self):
         return len(Corretor.identifica_posse(self.tokenizado(exclui_especiais=True)))
     
-

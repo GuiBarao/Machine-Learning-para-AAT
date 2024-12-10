@@ -5,7 +5,6 @@ sys.path.insert(0, 'src')
 from Texto import Texto
 import pandas as pd
 
-caminho_corpus = 'data\corpus_fundamental.xml'
 
 def nova_escala(valor, min_original, max_original, min_novo, max_novo):
    return ((valor - min_original)/ (max_original - min_original)) * (max_novo - min_novo) + min_novo
@@ -37,7 +36,7 @@ def col_pontuacao(data):
     return data
 
 def instancia_linha(row):
-    return Texto(row['essay'],row['pontuacao'], row['tipo'])
+    return Texto(row['essay'],row['pontuacao'], row['uso_AM'], 'kaggle')
 
 def elimina_flags(corpus):
     flags = ['[P]', '[ P]', '[p]', '{p}', '[S]', '[s]',
@@ -66,21 +65,21 @@ def cvs_to_xml():
     treino = col_pontuacao(raw_treino)
     validacao = col_pontuacao(raw_validacao)
     
-    teste['tipo'] = 'teste'
-    treino['tipo'] = 'treino'
-    validacao['tipo'] = 'treino'
+    teste['uso_AM'] = 'teste'
+    treino['uso_AM'] = 'treino'
+    validacao['uso_AM'] = 'treino'
 
     raw_corpus = pd.concat([teste,treino], ignore_index=True)
     raw_corpus = pd.concat([raw_corpus,validacao], ignore_index=True)
 
-    corpus = raw_corpus[['essay', 'pontuacao', 'tipo']]
+    corpus = raw_corpus[['essay', 'pontuacao', 'uso_AM']]
 
     corpus_sem_flags = elimina_flags(corpus)
 
     instancias = corpus_sem_flags.apply(instancia_linha, axis=1)
     
     for texto in instancias:
-        texto.to_xml(caminho_corpus)
+        texto.to_xml()
     
 def main():
     cvs_to_xml()

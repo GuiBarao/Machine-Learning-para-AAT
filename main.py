@@ -6,7 +6,7 @@ from Corretor import Corretor
 
 def main():
 
-    txt = Texto.xml_to_object(0, 'fundamental')
+    txt = Texto.xml_to_object(0, 'uol')
     print(txt.avaliacao)
     
 if __name__ == '__main__':
