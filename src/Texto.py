@@ -4,6 +4,7 @@ from Corretor import Corretor
 import pandas as pd
 import math
 import spacy
+import syllapy
 
 
 class Texto:
@@ -96,12 +97,14 @@ class Texto:
     #Retorna uma lista dos tokens da redacao. Filtra os tokens de acordo com as chaves.
     def tokenizado(self, exclui_stopwords = False, exclui_especiais = False):
         tokensTexto = Texto.pln(self.redacao)
-
+        
         if exclui_stopwords:
             tokensTexto = [token for token in tokensTexto if not token.is_stop]
 
         if exclui_especiais:
             tokensTexto = [token for token in tokensTexto if token.is_alpha]
+
+        tokensTexto = [token.text for token in tokensTexto]
 
         return tokensTexto
          
@@ -111,42 +114,69 @@ class Texto:
         return [stemmer.stem(token) for token in self.tokenizado()]
 
     # 1. number of characters
-    def nCaracteres(self):
+    def nChar(self):
         return len(self.redacao)
     
     # 2. number of words
-    def nPalavras(self):
-        return len(self.tokenizado(exclui_especiais=True))
+    def nWord(self):
+        return len(self.tokenizado(exclui_especiais=True, exclui_stopwords=True))
+    
+    def nSilabas(self):
+        tokens = self.tokenizado(exclui_especiais=True, exclui_stopwords=True)
+        contagem_silabas = list(map(syllapy.count, tokens))
+        return contagem_silabas
+
+    #3. number of long words
+    def nLongWords(self, min_nSilabas = 4):
+        contagem = self.nSilabas()
+        longas = [c for c in contagem if c >= min_nSilabas]
+        return len(longas)
+    
+    #4. number of short words
+    def nShortWords(self, max_nSilabas = 3):
+        contagem = self.nSilabas()
+        curtas = [c for c in contagem if c <= max_nSilabas]
+        return len(curtas)    
     
     def tamanho_palavras(self):
         palavras = self.tokenizado(exclui_especiais=True)
         return [len(word) for word in palavras]
 
-    # 6. average word length
-    def media_tamanho_palavras(self):
-        return sum(self.tamanho_palavras()) / self.nPalavras()
-    
-    # 10. most frequent word length
-    def tamanho_mais_frequente(self):
+    # 5. most frequent word length
+    def most_frequent_wordLen(self):
         tamanhos_palavras = self.tamanho_palavras()
         
         dict_frequencias = {tamanhos_palavras.count(tamanho) : tamanho for tamanho in tamanhos_palavras}
 
         maior_freq = max(dict_frequencias.keys())
         return dict_frequencias[maior_freq]
-    
-    #30. number of short words
-    def nPalavrasCurtas(self):
-        tokens = self.tokenizado(exclui_stopwords=True, exclui_especiais=True)
 
-        #tam_maximo_curtas = Corretor.media_tamanho_palavras()
-        tam_maximo_curtas = 6
-
-        tam = list(map(len, tokens))
-        curtas = list(filter(lambda x: x <= tam_maximo_curtas, tam))
-
-        return len(curtas)
+    # 6. average word length
+    def avarage_wordLen(self):
+        return sum(self.tamanho_palavras()) / self.nWord()
         
+    
+    def sentences(self):
+        pontos = ['.','!','?']
+        sentencas = []
+        tokens = self.tokenizado()
+
+        sentenca_aux = []
+        for token in tokens:
+
+            sentenca_aux.append(token)
+
+            if token in pontos:
+                sentencas.append(sentenca_aux)
+                sentenca_aux = []
+                
+        return sentencas
+
+    #7. number of sentences
+    def nSentences(self):
+        return len(self.sentences())
+
+
     # 19. number of different PoS tags
     def n_diferentes_posTags(self):
         tokens = self.tokenizado(exclui_especiais=True)

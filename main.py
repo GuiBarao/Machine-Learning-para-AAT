@@ -6,8 +6,8 @@ from Corretor import Corretor
 
 def main():
 
-    txt = Texto.xml_to_object(0, 'uol')
-    print(txt.avaliacao)
+    txt = Texto.xml_to_object(0, 'kaggle')
+    print(txt.nSentences())
     
 if __name__ == '__main__':
     main()
