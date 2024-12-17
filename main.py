@@ -2,12 +2,13 @@ import sys
 sys.path.insert(0, 'src')
 
 from Texto import Texto
-from Corretor import Corretor
 
 def main():
 
     txt = Texto.xml_to_object(0, 'kaggle')
-    print(txt.nSentences())
+
+
+    print(txt.nWord())
     
 if __name__ == '__main__':
     main()

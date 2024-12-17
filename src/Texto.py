@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 import nltk
-from Corretor import Corretor
+from src.Corretor import Corretor
 import pandas as pd
 import math
 import spacy
@@ -96,7 +96,14 @@ class Texto:
 
     #Retorna uma lista dos tokens da redacao. Filtra os tokens de acordo com as chaves.
     def tokenizado(self, exclui_stopwords = False, exclui_especiais = False):
-        tokensTexto = Texto.pln(self.redacao)
+        texto = self.redacao
+
+        #Elimina caracteres de controle
+        mapa_flags = '\n\t\r\x0b\x0c'
+        tabela = str.maketrans('','',mapa_flags)
+        texto_semFlags = texto.translate(tabela)
+
+        tokensTexto = Texto.pln(texto_semFlags)
         
         if exclui_stopwords:
             tokensTexto = [token for token in tokensTexto if not token.is_stop]
@@ -119,6 +126,7 @@ class Texto:
     
     # 2. number of words
     def nWord(self):
+        print(self.tokenizado(exclui_especiais=True, exclui_stopwords=True))
         return len(self.tokenizado(exclui_especiais=True, exclui_stopwords=True))
     
     def nSilabas(self):
@@ -159,22 +167,54 @@ class Texto:
     def sentences(self):
         pontos = ['.','!','?']
         sentencas = []
-        tokens = self.tokenizado()
+        tokens = self.tokenizado(exclui_stopwords=True)
 
         sentenca_aux = []
         for token in tokens:
 
-            sentenca_aux.append(token)
-
             if token in pontos:
                 sentencas.append(sentenca_aux)
                 sentenca_aux = []
+            else:
+                if token.isalpha:
+                    sentenca_aux.append(token)
                 
         return sentencas
 
     #7. number of sentences
     def nSentences(self):
         return len(self.sentences())
+
+    #8. number of long sentences
+    def nLongSentences(self, nPalavras_minimo = 20):
+        frases = self.sentences()
+        cont = 0
+        for frase in frases:
+            if len(frase) >= nPalavras_minimo:
+                cont+=1
+        
+        return cont
+    
+    #9. number of short sentences
+    def nShortSentences(self, nPalavras_maximo = 10):
+        frases = self.sentences()
+        cont = 0
+        for frase in frases:
+            if len(frase) <= nPalavras_maximo:
+                cont+=1
+        
+        return cont
+    
+    #10. most frequent sentence length 
+    def mostFrequent_sentenceLen(self):
+        frases = self.sentences()
+        tamanhos = [len(frase) for frase in frases]
+        print(frases)
+        dict_frequencias = {tam : tamanhos.count(tam) for tam in set(tamanhos)}
+        mais_frequente = max(dict_frequencias, key=dict_frequencias.get)
+        return mais_frequente
+
+
 
 
     # 19. number of different PoS tags
