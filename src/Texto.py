@@ -126,7 +126,6 @@ class Texto:
     
     # 2. number of words
     def nWord(self):
-        print(self.tokenizado(exclui_especiais=True, exclui_stopwords=True))
         return len(self.tokenizado(exclui_especiais=True, exclui_stopwords=True))
     
     def nSilabas(self):
@@ -176,7 +175,7 @@ class Texto:
                 sentencas.append(sentenca_aux)
                 sentenca_aux = []
             else:
-                if token.isalpha:
+                if token.isalpha():
                     sentenca_aux.append(token)
                 
         return sentencas
@@ -209,7 +208,7 @@ class Texto:
     def mostFrequent_sentenceLen(self):
         frases = self.sentences()
         tamanhos = [len(frase) for frase in frases]
-        print(frases)
+        
         dict_frequencias = {tam : tamanhos.count(tam) for tam in set(tamanhos)}
         mais_frequente = max(dict_frequencias, key=dict_frequencias.get)
         return mais_frequente

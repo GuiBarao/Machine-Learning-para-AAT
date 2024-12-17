@@ -9,6 +9,7 @@ def main():
 
 
     print(txt.nWord())
+    print(txt.mostFrequent_sentenceLen())
     
 if __name__ == '__main__':
     main()
