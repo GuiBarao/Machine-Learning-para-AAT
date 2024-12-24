@@ -8,8 +8,7 @@ def main():
     txt = Texto.xml_to_object(0, 'kaggle')
 
 
-    print(txt.nWord())
-    print(txt.mostFrequent_sentenceLen())
+    print(txt.nStopWords())
     
 if __name__ == '__main__':
     main()

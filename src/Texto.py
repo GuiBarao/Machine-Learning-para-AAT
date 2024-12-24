@@ -159,7 +159,7 @@ class Texto:
         return dict_frequencias[maior_freq]
 
     # 6. average word length
-    def avarage_wordLen(self):
+    def average_wordLen(self):
         return sum(self.tamanho_palavras()) / self.nWord()
         
     
@@ -213,6 +213,24 @@ class Texto:
         mais_frequente = max(dict_frequencias, key=dict_frequencias.get)
         return mais_frequente
 
+    #11. average sentence length
+    def average_sentenceLen(self):
+        frases = self.sentences()
+        tamanhos = [len(frase) for frase in frases]
+
+        return sum(tamanhos)/len(tamanhos)
+    
+    #12. number of different words
+    def nUniqueWords(self):
+        words = self.tokenizado(exclui_especiais=True, exclui_stopwords=True)
+        return len(set(words))
+
+    #13. number of stopwords.
+    def nStopWords(self):
+        tokens = self.tokenizado(exclui_especiais=True)
+        tokens_semStop = self.tokenizado(exclui_especiais=True, exclui_stopwords=True)
+
+        return len(tokens) - len(tokens_semStop)
 
 
 
