@@ -95,14 +95,14 @@ class Texto:
         return False
 
     #Retorna uma lista dos tokens da redacao. Filtra os tokens de acordo com as chaves.
-    def tokenizado(self, exclui_stopwords = False, exclui_especiais = False):
+    def tokenizado(self, exclui_stopwords = False, exclui_especiais = False, lower = False):
         texto = self.redacao
 
         #Elimina caracteres de controle
         mapa_flags = '\n\t\r\x0b\x0c'
         tabela = str.maketrans('','',mapa_flags)
         texto_semFlags = texto.translate(tabela)
-
+        
         tokensTexto = Texto.pln(texto_semFlags)
         
         if exclui_stopwords:
@@ -111,7 +111,11 @@ class Texto:
         if exclui_especiais:
             tokensTexto = [token for token in tokensTexto if token.is_alpha]
 
+
         tokensTexto = [token.text for token in tokensTexto]
+
+        if lower:
+            tokensTexto = [token.lower() for token in tokensTexto]
 
         return tokensTexto
          
@@ -125,23 +129,23 @@ class Texto:
         return len(self.redacao)
     
     # 2. number of words
-    def nWord(self):
+    def nWords(self):
         return len(self.tokenizado(exclui_especiais=True, exclui_stopwords=True))
     
-    def nSilabas(self):
+    def nSyllables_eachWord(self):
         tokens = self.tokenizado(exclui_especiais=True, exclui_stopwords=True)
         contagem_silabas = list(map(syllapy.count, tokens))
         return contagem_silabas
 
     #3. number of long words
     def nLongWords(self, min_nSilabas = 4):
-        contagem = self.nSilabas()
+        contagem = self.nSyllables_eachWord()
         longas = [c for c in contagem if c >= min_nSilabas]
         return len(longas)
     
     #4. number of short words
     def nShortWords(self, max_nSilabas = 3):
-        contagem = self.nSilabas()
+        contagem = self.nSyllables_eachWord()
         curtas = [c for c in contagem if c <= max_nSilabas]
         return len(curtas)    
     
@@ -160,7 +164,7 @@ class Texto:
 
     # 6. average word length
     def average_wordLen(self):
-        return sum(self.tamanho_palavras()) / self.nWord()
+        return sum(self.tamanho_palavras()) / self.nWords()
         
     
     def sentences(self):
@@ -233,6 +237,30 @@ class Texto:
         return len(tokens) - len(tokens_semStop)
 
 
+    def nComplexWords(self):
+
+        tokens = self.tokenizado(exclui_stopwords=True, exclui_especiais=True, lower=True)
+
+        freq = pd.read_csv('data\\frequencias.csv')
+        return freq['palavra'].isin(tokens).sum()
+
+    #14. Gunning Fog index
+    def gunningFog(self):
+        return 0.4 * ((self.nWords() / self.nSentences()) + 100 * (self.nComplexWords() / self.nWords()))
+        
+    #15. Flesch reading ease
+    def flesch_readindEase(self):
+        return 226 - 1.04 * (self.nWords() / self.nSentences()) - 72 * (sum(self.nSyllables_eachWord()) / self.nWords())
+    
+    #16. Flesch Kincaid grade level,
+    def flesch_kincaid(self):
+        return 0.36 * (self.nWords() / self.nSentences()) + 10.4 * (sum(self.nSyllables_eachWord()) / self.nWords()) - 18
+        
+    #17. Dale-Chall readability formula
+    def dale_chall(self):
+        percent_ComplexWords = (self.nComplexWords() / self.nWords()) * 100
+        return (0.1579 * percent_ComplexWords) + (0.0496 * self.average_sentenceLen()) + 3.6365
+
 
     # 19. number of different PoS tags
     def n_diferentes_posTags(self):
@@ -264,14 +292,6 @@ class Texto:
 
         return sum(pontuacoes)
 
-    def vocabulario(self):
-
-        tokens = self.tokenizado(exclui_stopwords=True, exclui_especiais=True)
-        frequencias = pd.read_csv('data\\frequencias.csv')
-
-        tokens_frequentes = frequencias[frequencias['palavra'].isin(tokens)]
-
-        return len(tokens) - len(tokens_frequentes)
     
     #Atributos de distância (Cos) e (Euclid)
     
