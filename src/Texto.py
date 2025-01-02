@@ -5,6 +5,7 @@ import pandas as pd
 import math
 import spacy
 import syllapy
+import math
 
 
 class Texto:
@@ -242,7 +243,7 @@ class Texto:
         tokens = self.tokenizado(exclui_stopwords=True, exclui_especiais=True, lower=True)
 
         freq = pd.read_csv('data\\frequencias.csv')
-        return freq['palavra'].isin(tokens).sum()
+        return self.nWords() - freq['palavra'].isin(tokens).sum()
 
     #14. Gunning Fog index
     def gunningFog(self):
@@ -260,6 +261,25 @@ class Texto:
     def dale_chall(self):
         percent_ComplexWords = (self.nComplexWords() / self.nWords()) * 100
         return (0.1579 * percent_ComplexWords) + (0.0496 * self.average_sentenceLen()) + 3.6365
+
+    def nLetters(self):
+        text = self.redacao
+        return sum(c.isalpha() for c in text)
+
+    #18. automated readability index
+    def automated_readabilityIndex(self):
+        return (4.6 * (self.nLetters() / self.nWords()) + 
+                0.44 * (self.nWords() / self.nSentences()) - 20)
+
+    #19. simple measure of Gobbledygook 
+    #adaptado
+    def simple_gobbledygook(self):
+        return math.sqrt(1.043 * (30 * self.nComplexWords() / self.nSentences()) + 3.1291)
+
+    #20. LIX
+    def lix(self):
+        return (self.nComplexWords() / self.nWords()) + self.average_sentenceLen()
+    
 
 
     # 19. number of different PoS tags
