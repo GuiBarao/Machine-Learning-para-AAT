@@ -7,7 +7,6 @@ import spacy
 import syllapy
 import math
 
-
 class Texto:
     diretorio_corpus_kaggle = 'data/corpus_kaggle.xml'
     diretorio_corpus_uol = 'data/corpus_uol.xml'
@@ -220,10 +219,7 @@ class Texto:
 
     #11. average sentence length
     def average_sentenceLen(self):
-        frases = self.sentences()
-        tamanhos = [len(frase) for frase in frases]
-
-        return sum(tamanhos)/len(tamanhos)
+        return self.nWords()/len(self.sentences())
     
     #12. number of different words
     def nUniqueWords(self):
@@ -239,7 +235,6 @@ class Texto:
 
 
     def nComplexWords(self):
-
         tokens = self.tokenizado(exclui_stopwords=True, exclui_especiais=True, lower=True)
 
         freq = pd.read_csv('data\\frequencias.csv')
@@ -278,11 +273,73 @@ class Texto:
 
     #20. LIX
     def lix(self):
-        return (self.nComplexWords() / self.nWords()) + self.average_sentenceLen()
+        return ((self.nComplexWords() / self.nWords()) * 100) + self.average_sentenceLen()
     
+    def nWordTypes(self):
+        return len(set(self.tokenizado(exclui_especiais=True, exclui_stopwords=True)))
 
+    #21. word variation index
+    def word_variationIndex(self):
 
-    # 19. number of different PoS tags
+        numerador = math.log(self.nWords(), 10)
+        denominador = math.log(2 - math.log(self.nUniqueWords(), 10) / math.log(self.nWords(), 10), 10)
+
+        return  numerador / denominador
+    
+    #23. type-token-ratio
+    def typeToken_ratio(self, tipo = 1):
+            return self.nWords() / self.nWordTypes()
+    
+    #24. Guiraud’s index
+    def guiraud_index(self):
+        return self.nWordsTypes() / math.sqrt(self.nWords())
+    
+    #25. Yule’s K
+    def yule_K(self):
+
+        tokens = self.tokenizado(exclui_especiais=True, exclui_stopwords=True)
+        dict_freq = {token : tokens.count(token) for token in tokens}
+        
+        maior_freq = max(dict_freq.values())
+
+        Vr = [None]
+        i = 1
+        while(i <= maior_freq):
+
+            r = list(dict_freq.values()).count(i)
+            Vr.append(r)
+            i+=1
+
+        somatorio = 0
+        for i, freq_Words in enumerate(Vr):
+            if i == 0:
+                continue
+
+            somatorio += (i * i) * freq_Words
+
+        numerador = somatorio - self.nWords()
+        
+        return math.pow(10,4) * numerador / math.pow(self.nWords(), 2)
+    
+    #27. hapax legomena - number of words occurring only once in a text, 
+    def hapax_legomena(self):
+        return self.nUniqueWords()
+
+    def nAdvanced_wordTypes(self):
+        tokens = self.tokenizado(exclui_stopwords=True, exclui_especiais=True, lower=True)
+
+        set_tokens = set(tokens)
+
+        freq = pd.read_csv('data\\frequencias.csv')
+
+        return len(set_tokens) - freq['palavra'].isin(set_tokens).sum()
+
+    #28. advanced Guiraud.
+    def advanced_guiraud(self):
+
+        return self.nAdvanced_wordTypes() / math.sqrt(self.nWords())
+       
+    #29. number of different PoS tags
     def n_diferentes_posTags(self):
         tokens = self.tokenizado(exclui_especiais=True)
         pos_tags = [token.pos_ for token in tokens]

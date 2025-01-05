@@ -7,9 +7,9 @@ import pandas as pd
 
 def main():
 
-    txt = Texto.xml_to_object(0, 'kaggle')
-    print(txt.redacao)
-    print(txt.lix())
+    txt = Texto.xml_to_object(40, 'uol')
+    print(txt.typeToken_ratio())
+    print(txt.D_estimate())
 
 
 if __name__ == '__main__':
