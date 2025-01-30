@@ -118,7 +118,13 @@ class Texto:
             tokensTexto = [token.lower() for token in tokensTexto]
 
         return tokensTexto
-         
+    
+    #Retorna uma dict no formato token : pos
+    def tokenizado_pos(self):
+        tokens = Texto.pln(self.redacao)
+
+        return {token.text : token.pos_ for token in tokens}
+
     #Retorna a lista de tokens após o processo de stemming
     def stemming(self):
         stemmer = nltk.stem.RSLPStemmer()
@@ -340,19 +346,68 @@ class Texto:
         return self.nAdvanced_wordTypes() / math.sqrt(self.nWords())
        
     #29. number of different PoS tags
-    def n_diferentes_posTags(self):
-        tokens = self.tokenizado(exclui_especiais=True)
-        pos_tags = [token.pos_ for token in tokens]
+    def n_differents_posTags(self):
+        dict_tokensPos = self.tokenizado_pos()
+        
+        posTags = dict_tokensPos.values()
 
-        set_tags = set(pos_tags)
+        set_tags = set(posTags)
         
         return len(set_tags)
     
-    def n_etiqueta(self, tag):
-        tokens_pos = self.tokenizado(etiquetados=True, exclui_especiais=True)
-        pos_tags = [token[1] for token in tokens_pos]
 
-        return pos_tags.count(tag)
+    def count_of_tag(self, searched_tag):
+        dict_tokensPos = self.tokenizado_pos()
+        
+        posTags = dict_tokensPos.values()
+
+        count = 0
+
+        for tag in posTags:
+            if(tag == searched_tag):
+                count+=1
+
+        return count
+
+    #33. coordinating conjunction
+    def n_coordinating_conjunction(self):
+        return self.count_of_tag("CCONJ")
+  
+    
+    #34. numeral
+    def n_numeral(self):
+        return self.count_of_tag("NUM")
+
+    #35. determiner
+    def n_determiner(self):
+        return self.count_of_tag("DET")
+    
+    #36. existential there
+    def n_existencial(self):
+        verbos_existenciais = [ "haver", "há", "havia", "houve", "haveria", "haverá", "haja", "houvesse", "houver", "houveram",
+                                "existir", "existe", "existia", "existiu", "existirá", "existiria", "exista", "existisse", "existirão",
+                                "ter", "tem", "tinha", "teve", "teria", "terá", "tenha", "tivesse", "terão"]
+        
+        tokens = self.tokenizado(exclui_especiais=True, lower=True)
+
+        count = 0
+        for token in tokens:
+            if(token in verbos_existenciais):
+                count += 1
+
+        return count
+
+    #38. adjective
+    def n_adjective(self):
+        return self.count_of_tag("ADJ")
+    
+    
+
+
+
+
+
+
 
     def erros_ortograficos(self):
         vocabulario = Corretor.vocabulario_textual()
@@ -511,11 +566,7 @@ class Texto:
         tokens = self.tokenizado(exclui_especiais=True)
         return len([token for token in tokens if token.pos_ == 'ADV'])
     
-    # 25. number of determiners
-    def nDET(self):
-        tokens = self.tokenizado(exclui_especiais=True)
-        return len([token for token in tokens if token.pos_ == 'DET'])
-    
+
     # 44. number of verbs - base form
     def nVERB(self):
         tokens = self.tokenizado(exclui_especiais=True)
