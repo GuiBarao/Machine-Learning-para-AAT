@@ -7,8 +7,7 @@ import pandas as pd
 
 def main():
 
-    txt = Texto.xml_to_object(0, 'kaggle')
-    print(txt.redacao)
+    txt = Texto.xml_to_object(0, 'uol')
 
 
 

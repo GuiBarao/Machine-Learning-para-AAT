@@ -1,15 +1,18 @@
 import xml.etree.ElementTree as ET
 import nltk
-from src.Corretor import Corretor
+from Corretor import Corretor
 import pandas as pd
 import math
 import spacy
 import syllapy
 import math
+from spellchecker import SpellChecker
+
 
 class Texto:
     diretorio_corpus_kaggle = 'data/corpus_kaggle.xml'
     diretorio_corpus_uol = 'data/corpus_uol.xml'
+    diretorio_dicionario = 'data/dicionario.txt'
     idBase = 0
     ultimo_id = 1234
     media_palavras_corpus = 148.37165991902833
@@ -96,7 +99,7 @@ class Texto:
 
     #Retorna uma lista dos tokens da redacao. Filtra os tokens de acordo com as chaves.
     def tokenizado(self, exclui_stopwords = False, exclui_especiais = False, lower = False):
-        texto = self.redacao
+        texto = str(self.redacao).replace('\n', ' ')
 
         #Elimina caracteres de controle
         mapa_flags = '\n\t\r\x0b\x0c'
@@ -110,7 +113,6 @@ class Texto:
 
         if exclui_especiais:
             tokensTexto = [token for token in tokensTexto if token.is_alpha]
-
 
         tokensTexto = [token.text for token in tokensTexto]
 
@@ -176,7 +178,7 @@ class Texto:
     def sentences(self):
         pontos = ['.','!','?']
         sentencas = []
-        tokens = self.tokenizado(exclui_stopwords=True)
+        tokens = self.tokenizado()
 
         sentenca_aux = []
         for token in tokens:
@@ -400,10 +402,92 @@ class Texto:
     #38. adjective
     def n_adjective(self):
         return self.count_of_tag("ADJ")
-    
-    
+
+    @staticmethod
+    def set_dicionario():
+        with open (Texto.diretorio_dicionario, 'r', encoding='utf-8') as arq:
+            lista = arq.readlines()
+
+        palavras = [linha.strip('\n') for linha in lista]
+
+        return set(palavras)
+
+    def nomes_proprios(self):
+        tokensTexto = Texto.pln(self.redacao)
+        nomes = [entidade.text.lower() for entidade in tokensTexto.ents if entidade.label_ == "PER"]
+        
+        nomes_maisculos_e_minusculos = []
+
+        for nome in nomes:
+            nomes_maisculos_e_minusculos.append(nome)
+            nomes_maisculos_e_minusculos.append(nome.capitalize())
 
 
+        return list(set(nomes_maisculos_e_minusculos))
+
+
+    #65. number of spellchecking errors  
+    def n_speelChecking_errors(self):        
+        tokens = self.tokenizado(exclui_especiais=True, lower=True)
+
+        cont = 0
+
+        dicionario_set = Texto.set_dicionario()
+        nomes_proprios = self.nomes_proprios()
+
+        for token in tokens:
+            
+            if (token not in dicionario_set) and (token not in nomes_proprios):
+                print(token)
+                cont +=1 
+
+        return cont
+        
+    #66. number of capitalization errors
+    def n_capitalization_errors(self):
+        
+        sentencas = self.sentences()
+        
+        count = 0
+
+        nomes_proprios = self.nomes_proprios()
+
+        for sent in sentencas:
+
+            for i, token in enumerate(sent):
+
+                if (str(token).islower()):
+                    if (i == 0) or (token in nomes_proprios):
+                        count += 1
+                        print(sent)
+                else:
+                    if (i != 0):
+                        count += 1
+                        print(sent)
+
+        return count
+
+    #67. number of punctuation errors
+    def n_punctuation_errors(self):
+
+        pass
+        #Vírgula;
+
+        #Ponto e vírgula;
+
+        #Ponto final;
+
+        #Ponto de exclamação;
+
+        #Ponto de interrogação;
+
+        #Dois-pontos;
+
+        #Aspas;
+
+        #Travessão;
+
+        #Parênteses.
 
 
 
