@@ -8,7 +8,7 @@ import pandas as pd
 def main():
 
     txt = Texto.xml_to_object(0, 'uol')
-
+    print(txt.count_of_tag('ADJ'))
 
 
 if __name__ == '__main__':

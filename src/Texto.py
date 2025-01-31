@@ -121,11 +121,11 @@ class Texto:
 
         return tokensTexto
     
-    #Retorna uma dict no formato token : pos
+    #Retorna uma Lista de tuplas token, pos
     def tokenizado_pos(self):
         tokens = Texto.pln(self.redacao)
 
-        return {token.text : token.pos_ for token in tokens}
+        return [(token.text, token.pos_) for token in tokens]
 
     #Retorna a lista de tokens após o processo de stemming
     def stemming(self):
@@ -349,9 +349,9 @@ class Texto:
        
     #29. number of different PoS tags
     def n_differents_posTags(self):
-        dict_tokensPos = self.tokenizado_pos()
+        tokensPos = self.tokenizado_pos()
         
-        posTags = dict_tokensPos.values()
+        posTags = [pos for _, pos in tokensPos]
 
         set_tags = set(posTags)
         
@@ -359,9 +359,9 @@ class Texto:
     
 
     def count_of_tag(self, searched_tag):
-        dict_tokensPos = self.tokenizado_pos()
+        tokensPos = self.tokenizado_pos()
         
-        posTags = dict_tokensPos.values()
+        posTags = [pos for _, pos in tokensPos]
 
         count = 0
 
