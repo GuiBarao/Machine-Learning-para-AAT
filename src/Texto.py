@@ -127,11 +127,6 @@ class Texto:
 
         return [(token.text, token.pos_) for token in tokens]
 
-    #Retorna a lista de tokens após o processo de stemming
-    def stemming(self):
-        stemmer = nltk.stem.RSLPStemmer()
-        return [stemmer.stem(token) for token in self.tokenizado()]
-
     # 1. number of characters
     def nChar(self):
         return len(self.redacao)
@@ -448,15 +443,12 @@ class Texto:
 
             if (Texto.adj_compIgualdade(tokenAnterior.text, tokenPosterior.text)):
                 count += 1
-                print(tokenAnterior.text, token.text, tokenPosterior.text)
 
             elif (Texto.adj_compSuperioridade(tokenAnterior.text, token.text)):
                 count += 1
-                print(tokenAnterior.text, token.text, tokenPosterior.text)
 
             elif (Texto.adj_compInferioridade(tokenAnterior.text)):
                 count += 1
-                print(tokenAnterior.text, token.text, tokenPosterior.text)
 
 
         return count
@@ -494,7 +486,117 @@ class Texto:
     
     #42. modal auxiliary
     def n_modalAuxiliary(self):
-        pass
+
+        tokens = Texto.pln(self.redacao)
+
+        modais_lista = ["dever", "ter", "precisar", "haver", "poder", "conseguir",
+                        "saber", "querer", "pretender", "convém"]
+        
+        return len([token.text for token in tokens if token.lemma_.lower() in modais_lista])
+    
+    #43. singular or mass common noun
+    def n_singular_or_massCommun_noun(self):
+        nomesProprios = self.nomes_proprios()
+
+        tokensPos = self.tokenizado_pos()
+
+        count = 0
+
+        for token, tag in tokensPos:
+            if tag == 'NOUN' and token.lower() not in nomesProprios:
+                count += 1
+
+        return count
+    
+    #44. plural common noun
+    def n_pluralCommonNoun(self):
+
+        tokens = Texto.pln(self.redacao)
+
+        nomesProprios = self.nomes_proprios()
+
+        count = 0
+
+        for token in tokens:
+            if token.pos_ == 'NOUN' and 'Plur' in str(token.morph) and token.text not in nomesProprios:
+                count += 1
+        
+        return count
+
+    #45. singular proper noun
+    def n_singularProperNoun(self):
+        tokens = Texto.pln(self.redacao)
+
+        nomesProprios = self.nomes_proprios()
+
+        count = 0
+        for token in tokens:
+            if token.text in nomesProprios and 'Plur' not in str(token.morph):
+                count += 1
+
+        return count
+    
+    #46. plural proper noun
+    def n_pluralProperNoun(self):
+        tokens = Texto.pln(self.redacao)
+
+        nomesProprios = self.nomes_proprios()
+
+        count = 0
+        for token in tokens:
+            if token.text in nomesProprios and 'Plur' in str(token.morph):
+                count += 1
+
+        return count
+    
+    #47. preposition
+    def n_preposition(self):
+        return self.count_of_tag("ADP")
+    
+    #48. participle
+    def n_participle(self):
+
+        tokens = Texto.pln(self.redacao)
+
+        count = 0
+        for token in tokens:
+            if token.pos_ == 'VERB' and 'VerbForm=Part' in str(token.morph):
+                count += 1
+
+        return count
+    
+
+    #49. predeterminer
+    def n_predeterminer(self):
+        tokens = self.tokenizado_pos()
+
+        count = 0
+        tagAnterior = None
+
+        for _, tag in tokens:
+
+            if(tag == 'DET') and (tagAnterior == 'DET'):
+                count += 1
+
+            tagAnterior = tag  
+
+        return count
+    
+    #50. genitive marker
+    def n_genitiveMarker(self):
+        tokens = Texto.pln(self.redacao)
+
+        genitives = ["de", "do", "da", "dos", "das"]
+
+        count = 0
+        for token in tokens:
+            if token.dep_ == 'case' and token.text.lower() in genitives:
+                count += 1
+        
+        return count
+    
+ 
+
 
     @staticmethod
     def set_dicionario():
@@ -531,7 +633,6 @@ class Texto:
         for token in tokens:
             
             if (token not in dicionario_set) and (token not in nomes_proprios):
-                print(token)
                 cont +=1 
 
         return cont
@@ -552,11 +653,9 @@ class Texto:
                 if (str(token).islower()):
                     if (i == 0) or (token in nomes_proprios):
                         count += 1
-                        print(sent)
                 else:
                     if (i != 0):
                         count += 1
-                        print(sent)
 
         return count
 
@@ -699,11 +798,6 @@ class Texto:
     
     #???
 
-    # 4. number of superlative adjectives
-    def nSuperlativos(self):
-        tokens = self.tokenizado(exclui_especiais=True, etiquetados=True)
-        
-        return len(Corretor.identifica_superlativos(tokens))
 
     # 5. number of predeterminers
     def nPreDeterminantes(self):

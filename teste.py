@@ -1,12 +1,12 @@
 import spacy
 
 
-txt = 'Isso pode ser raríssimo'
+txt = "Ele possue três casas."
 
 pln = spacy.load("pt_core_news_lg")
 
 tokens = pln(txt)
 
 for token in tokens:
-
-    print(f'{token.text} // {token.pos_} // {token.morph} // {token.dep_}')
+    
+        print(f'{token.text} // {token.pos_} // {token.tag_} // {token.morph} // {token.dep_}')

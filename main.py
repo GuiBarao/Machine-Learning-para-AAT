@@ -7,9 +7,9 @@ import pandas as pd
 
 def main():
 
-    txt = Texto.xml_to_object(0, 'uol')
+    txt = Texto.xml_to_object(340, 'uol')
     print(txt.redacao)
-    print(txt.n_numeral())
+    print(txt.n_genitiveMarker())
 
 
 if __name__ == '__main__':
