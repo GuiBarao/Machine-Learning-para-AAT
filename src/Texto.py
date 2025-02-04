@@ -295,7 +295,7 @@ class Texto:
         return  numerador / denominador
     
     #23. type-token-ratio
-    def typeToken_ratio(self, tipo = 1):
+    def typeToken_ratio(self):
             return self.nWords() / self.nWordTypes()
     
     #24. Guiraud’s index
@@ -399,9 +399,102 @@ class Texto:
 
         return count
 
+    #37. preposition/subordinating conjunction 
+    def n_preposition(self):
+        return self.count_of_tag("ADP")
+    
+    #37. preposition/subordinating conjunction 
+    def n_subordinatingConjunction(self):
+        return self.count_of_tag("SCONJ")
+    
     #38. adjective
     def n_adjective(self):
         return self.count_of_tag("ADJ")
+
+
+    @staticmethod
+    def adj_compIgualdade(tokenAnterior, tokenPosterior):
+        igualdade_adv1 = ['tão', 'quão', 'assim', 'tanto', 'quase', 'exatamente', 'igualmente']
+
+        igualdade_adv2 = ['quanto', 'como', 'que']
+
+        return (tokenAnterior.lower() in igualdade_adv1) and (tokenPosterior.lower() in igualdade_adv2)
+
+    @staticmethod
+    def adj_compSuperioridade(tokenAnterior, token):
+        irregulares = ['melhor', 'pior', 'maior', 'menor', 'superior', 'inferior']
+
+        return tokenAnterior == 'mais' or token.lower() in irregulares
+
+    @staticmethod
+    def adj_compInferioridade(tokenAnterior):
+        return (tokenAnterior.lower() == "menos")
+
+    #39. comparative adjective
+    def n_comparativeAdjective(self):
+
+        tokens = Texto.pln(self.redacao)
+        
+        count = 0
+        
+        for i, token in enumerate(tokens):
+
+            if (token.pos_ != 'ADJ') or (i == 0) or (i == len(tokens) -1):
+                continue
+
+            tokenAnterior = tokens[i-1]
+            tokenPosterior = tokens[i+1]
+
+
+            if (Texto.adj_compIgualdade(tokenAnterior.text, tokenPosterior.text)):
+                count += 1
+                print(tokenAnterior.text, token.text, tokenPosterior.text)
+
+            elif (Texto.adj_compSuperioridade(tokenAnterior.text, token.text)):
+                count += 1
+                print(tokenAnterior.text, token.text, tokenPosterior.text)
+
+            elif (Texto.adj_compInferioridade(tokenAnterior.text)):
+                count += 1
+                print(tokenAnterior.text, token.text, tokenPosterior.text)
+
+
+        return count
+
+    #40. superlative adjective
+    def n_superlativeAdjective(self):
+        sufixos = ['íssimo', 'íssima', 'íssimos', 'íssimas', 
+            'érrimo', 'érrima', 'érrimos', 'érrimas',
+            'ílimo', 'ílima', 'ílimo']
+
+        tokens = self.tokenizado_pos()
+
+        count = 0
+
+        for token, tag in tokens:
+            if(tag == "ADJ") and (token.lower() in sufixos):
+                count += 1 
+
+        return count
+
+
+    #41. ordinal adjective or numeral
+    def n_numeral(self):
+
+        tokens = Texto.pln(self.redacao)
+
+        count = 0
+
+        for token in tokens:
+
+            if "NumType=" in str(token.morph):
+                count += 1
+
+        return count
+    
+    #42. modal auxiliary
+    def n_modalAuxiliary(self):
+        pass
 
     @staticmethod
     def set_dicionario():
@@ -467,46 +560,6 @@ class Texto:
 
         return count
 
-    #67. number of punctuation errors
-    def n_punctuation_errors(self):
-
-        pass
-        #Vírgula;
-
-        #Ponto e vírgula;
-
-        #Ponto final;
-
-        #Ponto de exclamação;
-
-        #Ponto de interrogação;
-
-        #Dois-pontos;
-
-        #Aspas;
-
-        #Travessão;
-
-        #Parênteses.
-
-
-
-
-
-    def erros_ortograficos(self):
-        vocabulario = Corretor.vocabulario_textual()
-        tokens = self.tokenizado(exclui_especiais=True)
-
-        return [word for word in tokens if word not in vocabulario]
-    
-    # 32. number of spellchecking errors
-    def avaliacao_ortografica(self):
-        erros = self.erros_ortograficos()
-        correcoes = [Corretor.correcao_ortografica(erro) for erro in erros]
-        
-        pontuacoes = [correcao[2] for correcao in correcoes]
-
-        return sum(pontuacoes)
 
     
     #Atributos de distância (Cos) e (Euclid)
@@ -640,21 +693,9 @@ class Texto:
 
     #---PoS Tags---
 
-    # 12. number of adjectives
-    def nADJ(self):
-        tokens = self.tokenizado(exclui_especiais=True)
-        return len([token for token in tokens if token.pos_ == 'ADJ'])
 
-    # 26. number of adverbs
-    def nADV(self):
-        tokens = self.tokenizado(exclui_especiais=True)
-        return len([token for token in tokens if token.pos_ == 'ADV'])
     
 
-    # 44. number of verbs - base form
-    def nVERB(self):
-        tokens = self.tokenizado(exclui_especiais=True)
-        return len([token for token in tokens if token.pos_ == 'VERB'])
     
     #???
 
