@@ -6,8 +6,6 @@ from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 
 class Corretor:
 
-
-
     @staticmethod
     def similaridade_cosseno(texto1, texto2):
         vetorizador = TfidfVectorizer()
@@ -34,25 +32,5 @@ class Corretor:
 
         return int(soma/n_palavras)
 
-
-
-    @staticmethod
-    def identifica_posse(tokens):
-        verbos_posse = [
-                        "ter", "tenho", "tens", "tem", "temos", "têm",
-                        "tinha", "tinhas", "tinha", "tínhamos", "tinham",
-                        "terei", "terás", "terá", "teremos", "terão",
-                        "tenha", "tenhas", "tenha", "tenhamos", "tenham",
-
-                        "possuir", "possuo", "possuis", "possui", "possuímos", "possuem",
-                        "possuía", "possuías", "possuía", "possuíamos", "possuíam",
-                        "possuirei", "possuirás", "possuirá", "possuiremos", "possuirão",
-                        "possua", "possuas", "possua", "possuamos", "possuam",
-
-                        "pertencer", "pertenço", "pertences", "pertence", "pertencemos", "pertencem",
-                        "pertencia", "pertencías", "pertencia", "pertencíamos", "pertenciam",
-                        "pertencerei", "pertencerás", "pertencerá", "pertenceremos", "pertencerão",
-                        "pertença", "pertenças", "pertença", "pertençamos", "pertençam"]
-
-        return [token for token in tokens if token.text in verbos_posse]                
+              
 

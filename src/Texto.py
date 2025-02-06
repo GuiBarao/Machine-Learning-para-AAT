@@ -595,7 +595,200 @@ class Texto:
         
         return count
     
- 
+    #51. personal pronoun
+    def n_personalPronoun(self):
+        return self.count_of_tag("PRON")
+    
+    #52. possessive pronoun
+    def n_possessivePronoun(self):
+        pronomesPossesivos = ["meu", "minha", "meus", "minhas", "teu", "tua", "teus", "tuas",
+        "seu", "sua", "seus", "suas", "nosso", "nossa", "nossos", "nossas",
+            "vosso", "vossa", "vossos", "vossas"]
+        
+        tokens = self.tokenizado(exclui_especiais=True, lower=True)
+
+        count = 0
+
+        for token in tokens:
+            if token in pronomesPossesivos:
+                count += 1
+
+        return count
+
+    #53. adverb
+    def n_adverb(self):
+        return self.count_of_tag("ADV")
+    
+    #54. comparative adverb
+    def n_comparativeAdverb(self):
+        termosRegulares = ['mais', 'menos']
+        termosIrregulares = ['mais', 'menos', 'melhor', 'pior']
+
+        tokensPos = self.tokenizado_pos()
+
+        tokenAnterior = None
+        count = 0
+
+        for token, tag in tokensPos:
+
+            if tag == 'ADV' and tokenAnterior in termosRegulares:
+                count += 1
+                continue
+            elif tag == 'ADV' and token.lower() in termosIrregulares:
+                count+=1
+            
+            tokenAnterior = token.lower()
+
+        return count
+    
+
+    #55. superlative adverb
+    def n_superlativeAdverbs(self):
+        sufixos = ['íssimo', 'íssima', 'íssimos', 'íssimas', 
+            'érrimo', 'érrima', 'érrimos', 'érrimas',
+            'ílimo', 'ílima', 'ílimo']
+
+        tokens = self.tokenizado_pos()
+
+        count = 0
+
+        for token, tag in tokens:
+            if(tag == "ADV") and (token.lower() in sufixos):
+                count += 1 
+
+        return count
+
+    #56. particle, “to” as preposition or infinitive marker
+    def n_preposition_or_infinitive(self):
+        preposicoes = ["para", "a", "até", "na", "no"]
+
+        tokens = Texto.pln(self.redacao)
+        count = 0
+
+        for token in tokens:
+
+            if('VerbForm=Inf' in token.morph):
+                count += 1
+                continue
+
+            if(token.pos_ == 'ADP') and (token.text.lower() in preposicoes):
+                count += 1
+
+
+        return count
+            
+    #57. verb - base form
+    def n_verb_baseForm(self):
+        tokens = Texto.pln(self.redacao)
+        count = 0
+
+        for token in tokens:
+
+            if('VerbForm=Inf' in token.morph):
+                count += 1
+
+
+        return count
+
+    #58. verb - past tense
+    def n_verb_pastTense(self):
+        tokens = Texto.pln(self.redacao)
+        count = 0
+
+        pos_verbs = ['VERB', 'AUX']
+
+        for token in tokens:
+
+            if (token.pos_ in pos_verbs) and ('Tense=Past' in token.morph):
+                count += 1
+
+
+        return count
+
+    #59. verb - gerund/present participle 
+    def n_verb_gerund(self):
+        tokens = Texto.pln(self.redacao)
+        count = 0
+
+        pos_verbs = ['VERB', 'AUX']
+
+        for token in tokens:
+
+            if (token.pos_ in pos_verbs) and ('VerbForm=Ger' in token.morph):
+                count += 1
+                
+        return count
+
+    #60. verb - past participle
+    def n_verb_pastParticiple(self):
+        tokens = Texto.pln(self.redacao)
+        count = 0
+
+        pos_verbs = ['VERB', 'AUX']
+
+        for token in tokens:
+
+            if (token.pos_ in pos_verbs) and ('VerbForm=Part' in token.morph):
+                count += 1
+
+
+        return count
+
+    #61. verb - 3rd person sing. present
+    def n_verb_thirdPersonSingPresent(self):
+        tokens = Texto.pln(self.redacao)
+        count = 0
+
+        pos_verbs = ['VERB', 'AUX']
+
+        for token in tokens:
+
+            if (token.pos_ in pos_verbs) and ('Number=Sing' in token.morph) and ('Person=3' in token.morph) and ('Tense=Pres' in token.morph):
+                count += 1
+
+        return count
+    
+    #62. wh-determiner
+    def n_whDeterminer(self):
+        tokens = Texto.pln(self.redacao)
+        count = 0
+
+        whDeterminers = ["que", "qual", "quais"]
+
+        for token in tokens:
+
+            if token.pos_ == 'DET' and token.text.lower() in whDeterminers:
+                count += 1
+
+        return count
+
+    #63. wh-pronoun
+    def n_whPronoun(self):
+        tokens = self.tokenizado(lower=True)
+        count = 0
+
+        whPronouns = ['quem', 'que', 'qual', 'quais']
+
+        for token in tokens:
+            if token in whPronouns:
+                count += 1
+
+        return count
+    
+    #64. wh-adverb
+    def n_whAdverb(self):
+        whAdverbs = ["quando", "onde", "aonde", "donde", "porque", "como", "quão"]
+
+        tokens = self.tokenizado(lower=True)
+        count = 0
+        for i, token in enumerate(tokens):
+
+            if token in whAdverbs:
+                count += 1
+            elif i != 0 and token == 'que' and tokens[i-1] == 'por':
+                count += 1 
+
+        return count
 
 
     @staticmethod
