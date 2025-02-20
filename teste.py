@@ -1,7 +1,7 @@
 import spacy
 
 
-txt = 'Quando você nasceu?'
+txt = 'Eu tenho duas casas.'
 
 pln = spacy.load("pt_core_news_lg")
 

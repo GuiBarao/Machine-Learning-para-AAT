@@ -12,20 +12,17 @@ def busca():
         try:
             txt = Texto.xml_to_object(id, 'kaggle')
             id += 1
-
-            n = txt.n_whAdverb()
-
-            if n != 0:
-                print(id, '//', n)
+            print(id)
+            print(txt.nominal_ratio())
+            print('foi')
         except:
             exit()
 
 
 def main():
-
     busca()
     txt = Texto.xml_to_object(2, 'kaggle')
-    print(txt.n_verb_thirdPersonSingPresent())
+    print(txt.averageDistance_neighboringPoints_cos())
 
 
     

@@ -1,12 +1,11 @@
 import xml.etree.ElementTree as ET
-import nltk
-from Corretor import Corretor
 import pandas as pd
 import math
 import spacy
 import syllapy
 import math
-from spellchecker import SpellChecker
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 
 
 class Texto:
@@ -288,7 +287,31 @@ class Texto:
         denominador = math.log(2 - math.log(self.nUniqueWords(), 10) / math.log(self.nWords(), 10), 10)
 
         return  numerador / denominador
+
+    def n_substantivos(self):
+        return self.count_of_tag("NOUN")
+
+    def n_pronomes(self):
+        return self.count_of_tag("PRON")
     
+    def n_verbos(self):
+        return self.count_of_tag("VERB")
+    
+    #22. nominal ratio
+    def nominal_ratio(self):
+        substantivos = self.n_substantivos()
+        preposicoes = self.n_preposition()
+        participios = self.n_participle()
+        pronomes = self.n_pronomes()
+        adverbios = self.n_adverb()
+        verbos = self.n_verbos()
+
+        try:
+            return (substantivos + preposicoes + participios) / (pronomes + adverbios + verbos)
+        except:
+            print("denominador : ", (pronomes + adverbios + verbos))
+            return 0
+
     #23. type-token-ratio
     def typeToken_ratio(self):
             return self.nWords() / self.nWordTypes()
@@ -855,13 +878,13 @@ class Texto:
 
     
     #Atributos de distância (Cos) e (Euclid)
-    
+
     def janelas_deslizantes(self):
         
         tokens = self.tokenizado()
-        palavras_texto = [token.text for token in tokens]
 
-        tam_janela = int(len(palavras_texto) * 0.25) + 1
+
+        tam_janela = int(len(tokens) * 0.25) + 1
         tam_janela = max(tam_janela, 1)
 
         #   25          = 10
@@ -874,136 +897,203 @@ class Texto:
         
         fim = tam_janela
 
-        while(fim <= len(palavras_texto)):
+        while(fim <= len(tokens)):
 
-            janelas.append(palavras_texto[inicio : fim])
+            janelas.append(tokens[inicio : fim])
             
             inicio += passo
             fim += passo
 
-            if (fim > len(palavras_texto)):
+            if (fim > len(tokens)):
 
-                fim = len(palavras_texto)
-                janelas.append(palavras_texto[inicio : fim])
+                fim = len(tokens)
+                janelas.append(tokens[inicio : fim])
                 break
         
         janelas_strings = [' '.join(janela) for janela in janelas]
 
         return janelas_strings
 
-    def cossenos(self, qualquer_ponto = False, vizinhos = False):
+    def similaridade_cosseno(self, texto1, texto2):
+        vetorizador = TfidfVectorizer()
+        matriz = vetorizador.fit_transform([texto1,texto2])
+        similaridade = cosine_similarity(matriz[0:1], matriz[1:2])
+        return float(similaridade[0][0])
+
+
+    def distancia_euclid(self, texto1, texto2):
+        vetorizador = TfidfVectorizer()
+        matriz = vetorizador.fit_transform([texto1,texto2])
+        distancias = euclidean_distances(matriz[0:1], matriz[1:2])
+        return float(distancias[0][0])
+
+
+
+    #-----------73 Cos--------------
+
+    def distancias_pontosVizinhos_cos(self):
+        distancias_cos = []
         janelas = self.janelas_deslizantes()
 
-        similaridades = []
+        for i, janela in enumerate(janelas):
 
-        if (vizinhos and not qualquer_ponto):
-            indice = 1
+            if(i == 0):
+                continue
 
-            while(indice < len(janelas)):
-                cosseno = Corretor.similaridade_cosseno(janelas[indice-1], janelas[indice])
-                similaridades.append(cosseno)
-                indice+=1
+            similaridade = self.similaridade_cosseno(janelas[i-1], janela)
 
-        
-        if(qualquer_ponto and not vizinhos):
-            for i, janela in enumerate(janelas):
-                for j in range(i+1, len(janelas)):
-                    similaridades.append(Corretor.similaridade_cosseno(janela, janelas[j]))
+            distancia = 1 - similaridade
 
-        return similaridades
+            distancias_cos.append(distancia)
+
+        return distancias_cos
     
-    def euclid(self, qualquer_ponto = False, vizinhos = False):
+    #73. average distance between neighboring points, Cos / Euclid
+    def averageDistance_neighboringPoints_cos(self):
+        distancias = self.distancias_pontosVizinhos_cos()
+        return sum(distancias)/len(distancias)
+    
+    #-----------73 Cos--------------
+
+
+    #-----------73 Euclid-----------
+
+    def distancias_pontosVizinhos_euclid(self):
+        distancias_euclid = []
+        janelas = self.janelas_deslizantes()
+
+        for i, janela in enumerate(janelas):
+
+            if(i == 0):
+                continue
+
+            distancia = self.distancia_euclid(janelas[i-1], janela)
+
+
+            distancias_euclid.append(distancia)
+
+        return distancias_euclid
+
+    #73. average distance between neighboring points, Cos / Euclid
+    def averageDistance_neighboringPoints_euclid(self):
+        distancias = self.distancias_pontosVizinhos_euclid()
+        return sum(distancias)/len(distancias)
+
+    #-----------73 Euclid-----------
+
+
+    #-----------74 Cos--------------
+
+    #74. minimum and maximum distance between neighboring points and their quotient
+    def minDistance_neighboringPointsCos(self):
+        distancias = self.distancias_pontosVizinhos_cos()
+        return min(distancias)
+    
+    #74. minimum and maximum distance between neighboring points and their quotient
+    def maxDistance_neighboringPointsCos(self):
+        distancias = self.distancias_pontosVizinhos_cos()
+        return max(distancias)
+    
+    #74. minimum and maximum distance between neighboring points and their quotient
+    def quotientDistance_neighboringPointsCos(self):
+        menor = self.minDistance_neighboringPointsCos()
+        maior = self.maxDistance_neighboringPointsCos()
+        return maior/menor
+    
+    #-----------74 Cos--------------
+
+
+    #-----------74 Euclid-----------
+
+    #74. minimum and maximum distance between neighboring points and their quotient
+    def minDistance_neighboringPointsEuclid(self):
+        distancias = self.distancias_pontosVizinhos_euclid()
+        return min(distancias)
+    
+    #74. minimum and maximum distance between neighboring points and their quotient
+    def maxDistance_neighboringPointsEuclid(self):
+        distancias = self.distancias_pontosVizinhos_euclid()
+        return max(distancias)
+    
+    #74. minimum and maximum distance between neighboring points and their quotient
+    def quotientDistance_neighboringPointsEuclid(self):
+        menor = self.minDistance_neighboringPointsEuclid()
+        maior = self.maxDistance_neighboringPointsEuclid()
+        return maior/menor
+    
+    #-----------74 Euclid-----------
+
+
+    #-----------75 Cos--------------
+
+    def distancias_qualquerPontos_cos(self):
+
         janelas = self.janelas_deslizantes()
 
         distancias = []
 
-        if (vizinhos and not qualquer_ponto):
-            distancias = [Corretor.distancia_euclid(janelas[i-1], janela) for i, janela in enumerate(janelas) if i != 0]
+        for i, janela in enumerate(janelas):
 
-        if (qualquer_ponto and not vizinhos):
-            for i, janela in enumerate(janelas):
-                for j in range(i+1, len(janelas)):
-                    distancias.append(Corretor.distancia_euclid(janela, janelas[j]))
+            for j in range(i+1, len(janelas)):
+                similaridade = (self.similaridade_cosseno(janela, janelas[j]))
+
+                distancia = 1 - similaridade
+                distancias.append(distancia)
 
         return distancias
 
-    # -----Euclid-----
+    #75. average distance between any two points
+    def averageDistance_anyTwoPoints_cos(self):
+        distancias = self.distancias_qualquerPontos_cos()
 
-    # 21. minimum distance between neighboring points (Euclid)
-    def menor_distancia_euclid(self):
-        distancias = self.euclid(vizinhos=True)
-        return min(distancias)
+        return sum(distancias) / len(distancias)
     
-    # 35. maximum distance between neighboring points (Euclid)
-    def maior_distancia_euclid(self):
-        distancias = self.euclid(vizinhos=True)
+    #-----------75 Cos--------------
+
+    #-----------75 Euclid-----------
+
+    def distancias_qualquerPontos_euclid(self):
+
+        janelas = self.janelas_deslizantes()
+
+        distancias = []
+
+        for i, janela in enumerate(janelas):
+
+            for j in range(i+1, len(janelas)):
+                distancia = (self.distancia_euclid(janela, janelas[j]))
+
+                distancias.append(distancia)
+
+        return distancias
+
+    #75. average distance between any two points
+    def averageDistance_anyTwoPoints_euclid(self):
+        distancias = self.distancias_qualquerPontos_euclid()
+
+        return sum(distancias) / len(distancias)
+    
+    #-----------75 Euclid-----------
+
+    #-----------76 Cos--------------
+
+    #76. maximum difference between any two points
+    def maxDifference_anyTwoPoints_cos(self):
+        distancias = self.distancias_qualquerPontos_cos()
+        return max(distancias)
+    
+    #-----------76 Cos--------------
+
+    #-----------76 Euclid-----------
+
+    #76. maximum difference between any two points
+    def maxDifference_anyTwoPoints_euclid(self):
+        distancias = self.distancias_qualquerPontos_euclid()
         return max(distancias)
 
-    # 34. index (minimum distance/maximum distance) (Euclid)
-    def euclid_index(self):
-        return self.maior_distancia_euclid() / self.menor_distancia_euclid()
+    #-----------76 Euclid-----------
 
-    # 40. average distance between any two points (Euclid)
-    def distancia_media_euclid(self):
-        distancias = self.euclid(qualquer_ponto=True)
-        return sum(distancias) / len(distancias)
+    #-----------76 Cos--------------
 
-    #-----Cosseno-----
-
-    #39. maximum distance between neighboring points (Cos)
-    def maior_distancia_cosseno(self, qualquer_ponto = False, vizinhos = False):
-        return min(self.cossenos(vizinhos = vizinhos, qualquer_ponto=qualquer_ponto))
-
-    # X. minimum distance between neighboring points (Cos)
-    def menor_distancia_cosseno(self, qualquer_ponto = False, vizinhos = False):
-        return max(self.cossenos(vizinhos = vizinhos, qualquer_ponto=qualquer_ponto))
-
-    # 36. index (minimum distance/maximum distance) (Cos)
-    # 31. index (minimum distance/maximum distance) (Cos)
-    def cosseno_index(self, qualquer_ponto = False, vizinhos = False):
-        menor = self.menor_distancia_cosseno(vizinhos = vizinhos, qualquer_ponto=qualquer_ponto)
-        maior = self.maior_distancia_cosseno(vizinhos = vizinhos, qualquer_ponto=qualquer_ponto)
-        return menor/maior
-    
-    # 33. average distance between any two points (Cos)
-    def media_distancia_cosseno(self,qualquer_ponto = False, vizinhos = False):
-        similaridades = self.cossenos(vizinhos = vizinhos, qualquer_ponto=qualquer_ponto)
-        distancias = [1 - valor for valor in similaridades]
-        return sum(distancias)/len(distancias)
-    
-    # 48. maximum difference between any two points (Cos)
-    def maior_diferenca_cosseno(self, qualquer_ponto = False, vizinhos = False):
-        similaridades = self.cossenos(vizinhos = vizinhos, qualquer_ponto=qualquer_ponto)
-        distancias = [1 - valor for valor in similaridades]
-        diferencas = []
-
-        for i, distancia in enumerate(distancias):
-            for j in range(i+1, len(distancias)):
-                diferencas.append(abs(distancia - distancias[j]))
-
-        return max(diferencas)
-
-    #---PoS Tags---
-
-
-    
-
-    
-    #???
-
-
-    # 5. number of predeterminers
-    def nPreDeterminantes(self):
-        tokens = self.tokenizado(exclui_especiais=True, etiquetados = True)
-        predeterminantes = Corretor.identifica_predeterminantes(tokens)
-        return len(predeterminantes)
-    
-    # 7. number of existential there’s
-    def nConstrucoes_existenciais(self):
-        tokens = self.tokenizado(exclui_especiais=True)
-        return len(Corretor.identifica_existenciais(tokens))
-    
-    # 8. number of genitive markers
-    def nPosse(self):
-        return len(Corretor.identifica_posse(self.tokenizado(exclui_especiais=True)))
-    
+    #77. Clark and Evan’s distance to the nearest neighbor
+    #def clarkEvans_distance_neighbors_cos(self):
