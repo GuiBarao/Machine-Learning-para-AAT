@@ -375,6 +375,23 @@ class Texto:
         
         return len(set_tags)
     
+    #30. height of the tree presenting sentence structure
+    def height_treeSentence(self):
+        sentencas = self.sentences
+        somaAlturas = 0
+        #BUGADO
+        for sentenca in sentencas:
+            doc_sentenca = Texto.pln(sentenca)
+
+            n_antecessores = [len(list(token.ancestors)) for token in doc_sentenca]
+
+            somaAlturas =+ max(n_antecessores) + 1
+
+        return somaAlturas
+
+
+
+
 
     def count_of_tag(self, searched_tag):
         tokensPos = self.tokenizado_pos()

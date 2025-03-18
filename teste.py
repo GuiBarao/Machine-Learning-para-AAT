@@ -1,12 +1,13 @@
 import spacy
 
+nlp = spacy.load("pt_core_news_sm")
+frase = "O gato dorme tranquilamente na cama."
+doc = nlp(frase)
 
-txt = 'Eu tenho duas casas.'
 
-pln = spacy.load("pt_core_news_lg")
+# Função para calcular a altura
+def altura_arvore(doc):
+    return max(len(list(token.ancestors)) for token in doc) + 1
 
-tokens = pln(txt)
-
-for token in tokens:
-    
-        print(f'{token.text} // {token.pos_} // {token.tag_} // {token.morph} // {token.dep_} // {token.lemma_}')
+altura = altura_arvore(doc)
+print(f"Altura da árvore sintática: {altura}")

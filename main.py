@@ -13,7 +13,7 @@ def busca():
             txt = Texto.xml_to_object(id, 'kaggle')
             id += 1
             print(id)
-            print(txt.nominal_ratio())
+            print(txt.height_treeSentence())
             print('foi')
         except:
             exit()
