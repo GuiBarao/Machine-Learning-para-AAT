@@ -9,20 +9,20 @@ def busca():
 
     while(True):
 
-        try:
-            txt = Texto.xml_to_object(id, 'kaggle')
-            id += 1
-            print(id)
-            print(txt.height_treeSentence())
-            print('foi')
-        except:
-            exit()
+
+        txt = Texto.xml_to_object(id, 'uol')
+        id += 1
+        print(id)
+        print("---",txt.height_treeSentence(),"---")
 
 
 def main():
+    
     busca()
-    txt = Texto.xml_to_object(2, 'kaggle')
-    print(txt.averageDistance_neighboringPoints_cos())
+
+    txt = Texto.xml_to_object(18, 'uol')
+    print(txt.height_treeSentence())
+
 
 
     

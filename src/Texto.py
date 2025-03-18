@@ -377,15 +377,15 @@ class Texto:
     
     #30. height of the tree presenting sentence structure
     def height_treeSentence(self):
-        sentencas = self.sentences
+        doc = Texto.pln(self.redacao)
         somaAlturas = 0
-        #BUGADO
-        for sentenca in sentencas:
-            doc_sentenca = Texto.pln(sentenca)
 
-            n_antecessores = [len(list(token.ancestors)) for token in doc_sentenca]
+        for sentenca in doc.sents:
 
-            somaAlturas =+ max(n_antecessores) + 1
+            n_antecessores = [len(list(token.ancestors)) for token in sentenca]
+            
+            somaAlturas += max(n_antecessores) + 1
+            
 
         return somaAlturas
 
