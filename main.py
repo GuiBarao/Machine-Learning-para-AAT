@@ -21,7 +21,7 @@ def main():
     #busca()
 
     txt = Texto.xml_to_object(18, 'uol')
-    print(txt.average_distance_nearestNeighbor(tipo_distancia="euclid"))
+    print(txt.maxDifference_anyTwoPoints(tipo_distancia="euclid"))
 
 
 

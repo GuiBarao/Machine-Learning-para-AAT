@@ -937,7 +937,6 @@ class Texto:
         similaridade = cosine_similarity(matriz[0:1], matriz[1:2])
         return float(similaridade[0][0])
 
-
     def distancia_euclid(self, texto1, texto2):
         vetorizador = TfidfVectorizer()
         matriz = vetorizador.fit_transform([texto1,texto2])
@@ -946,130 +945,55 @@ class Texto:
 
 
 
-    #-----------73 Cos--------------
-
-    def distancias_pontosVizinhos_cos(self):
-        distancias_cos = []
-        janelas = self.janelas_deslizantes()
-
-        for i, janela in enumerate(janelas):
-
-            if(i == 0):
-                continue
-
-            similaridade = self.similaridade_cosseno(janelas[i-1], janela)
-
-            distancia = 1 - similaridade
-
-            distancias_cos.append(distancia)
-
-        return distancias_cos
-    
-    #73. average distance between neighboring points, Cos / Euclid
-    def averageDistance_neighboringPoints_cos(self):
-        distancias = self.distancias_pontosVizinhos_cos()
-        return sum(distancias)/len(distancias)
-    
-    #-----------73 Cos--------------
-
-
-    #-----------73 Euclid-----------
-
-    def distancias_pontosVizinhos_euclid(self):
-        distancias_euclid = []
-        janelas = self.janelas_deslizantes()
-
-        for i, janela in enumerate(janelas):
-
-            if(i == 0):
-                continue
-
-            distancia = self.distancia_euclid(janelas[i-1], janela)
-
-
-            distancias_euclid.append(distancia)
-
-        return distancias_euclid
-
-    #73. average distance between neighboring points, Cos / Euclid
-    def averageDistance_neighboringPoints_euclid(self):
-        distancias = self.distancias_pontosVizinhos_euclid()
-        return sum(distancias)/len(distancias)
-
-    #-----------73 Euclid-----------
-
-
-    #-----------74 Cos--------------
-
-    #74. minimum and maximum distance between neighboring points and their quotient
-    def minDistance_neighboringPointsCos(self):
-        distancias = self.distancias_pontosVizinhos_cos()
-        return min(distancias)
-    
-    #74. minimum and maximum distance between neighboring points and their quotient
-    def maxDistance_neighboringPointsCos(self):
-        distancias = self.distancias_pontosVizinhos_cos()
-        return max(distancias)
-    
-    #74. minimum and maximum distance between neighboring points and their quotient
-    def quotientDistance_neighboringPointsCos(self):
-        menor = self.minDistance_neighboringPointsCos()
-        maior = self.maxDistance_neighboringPointsCos()
-        return maior/menor
-    
-    #-----------74 Cos--------------
-
-
-    #-----------74 Euclid-----------
-
-    #74. minimum and maximum distance between neighboring points and their quotient
-    def minDistance_neighboringPointsEuclid(self):
-        distancias = self.distancias_pontosVizinhos_euclid()
-        return min(distancias)
-    
-    #74. minimum and maximum distance between neighboring points and their quotient
-    def maxDistance_neighboringPointsEuclid(self):
-        distancias = self.distancias_pontosVizinhos_euclid()
-        return max(distancias)
-    
-    #74. minimum and maximum distance between neighboring points and their quotient
-    def quotientDistance_neighboringPointsEuclid(self):
-        menor = self.minDistance_neighboringPointsEuclid()
-        maior = self.maxDistance_neighboringPointsEuclid()
-        return maior/menor
-    
-    #-----------74 Euclid-----------
-
-
-    #-----------75 Cos--------------
-
-    def distancias_qualquerPontos_cos(self):
-
-        janelas = self.janelas_deslizantes()
-
+    def distancias_pontosVizinhos(self, tipo_distancia = "cos"):
         distancias = []
+        janelas = self.janelas_deslizantes()
 
         for i, janela in enumerate(janelas):
 
-            for j in range(i+1, len(janelas)):
-                similaridade = (self.similaridade_cosseno(janela, janelas[j]))
-
+            if(i == 0):
+                continue
+            
+            if(tipo_distancia == "cos"):
+                similaridade = self.similaridade_cosseno(janelas[i-1], janela)
                 distancia = 1 - similaridade
-                distancias.append(distancia)
+
+            elif(tipo_distancia == "euclid"):
+                distancia = self.distancia_euclid(janelas[i-1], janela)
+
+            else:
+                raise ValueError
+
+            distancias.append(distancia)
 
         return distancias
-
-    #75. average distance between any two points
-    def averageDistance_anyTwoPoints_cos(self):
-        distancias = self.distancias_qualquerPontos_cos()
-
-        return sum(distancias) / len(distancias)
     
-    #-----------75 Cos--------------
+    #73. average distance between neighboring points, Cos / Euclid
+    def averageDistance_neighboringPoints(self, tipo_distancia = "cos"):
+        distancias = self.distancias_pontosVizinhos(tipo_distancia= tipo_distancia)
+        return sum(distancias)/len(distancias)
+    
 
-    #-----------75 Euclid-----------
 
-    def distancias_qualquerPontos_euclid(self):
+    #74. minimum and maximum distance between neighboring points and their quotient
+    def minDistance_neighboringPoints(self, tipo_distancia = "cos"):
+        distancias = self.distancias_pontosVizinhos(tipo_distancia=tipo_distancia)
+        return min(distancias)
+    
+    #74. minimum and maximum distance between neighboring points and their quotient
+    def maxDistance_neighboringPoints(self, tipo_distancia = "cos"):
+        distancias = self.distancias_pontosVizinhos(tipo_distancia=tipo_distancia)
+        return max(distancias)
+    
+    #74. minimum and maximum distance between neighboring points and their quotient
+    def quotientDistance_neighboringPoints(self, tipo_distancia = "cos"):
+        menor = self.minDistance_neighboringPoints(tipo_distancia=tipo_distancia)
+        maior = self.maxDistance_neighboringPoints(tipo_distancia=tipo_distancia)
+        return maior/menor
+    
+
+
+    def distancias_qualquerPontos(self, tipo_distancia = "cos"):
 
         janelas = self.janelas_deslizantes()
 
@@ -1078,41 +1002,35 @@ class Texto:
         for i, janela in enumerate(janelas):
 
             for j in range(i+1, len(janelas)):
-                distancia = (self.distancia_euclid(janela, janelas[j]))
 
+                if(tipo_distancia == "cos"):
+                    similaridade = (self.similaridade_cosseno(janela, janelas[j]))
+                    distancia = 1 - similaridade
+
+                elif(tipo_distancia == "euclid"):
+                    distancia = self.distancia_euclid(janela, janelas[j])
+                
+                else:
+                    raise ValueError
+                
                 distancias.append(distancia)
 
         return distancias
 
     #75. average distance between any two points
-    def averageDistance_anyTwoPoints_euclid(self):
-        distancias = self.distancias_qualquerPontos_euclid()
-
+    def averageDistance_anyTwoPoints(self, tipo_distancia = "cos"):
+        distancias = self.distancias_qualquerPontos(tipo_distancia=tipo_distancia)
         return sum(distancias) / len(distancias)
     
-    #-----------75 Euclid-----------
-
-    #-----------76 Cos--------------
+    
 
     #76. maximum difference between any two points
-    def maxDifference_anyTwoPoints_cos(self):
-        distancias = self.distancias_qualquerPontos_cos()
+    def maxDifference_anyTwoPoints(self, tipo_distancia = "cos"):
+        distancias = self.distancias_qualquerPontos(tipo_distancia=tipo_distancia)
         return max(distancias)
     
-    #-----------76 Cos--------------
-
-    #-----------76 Euclid-----------
-
-    #76. maximum difference between any two points
-    def maxDifference_anyTwoPoints_euclid(self):
-        distancias = self.distancias_qualquerPontos_euclid()
-        return max(distancias)
-
-    #-----------76 Euclid-----------
 
    
-
-
     def nearestNeighbors(self, tipo_distancia = "cos"):
 
         if tipo_distancia == "cos":
@@ -1139,7 +1057,7 @@ class Texto:
         
         return vizinhos_maisProximos
 
-            
+         
     #78. average distance to the nearest neighbor
     def average_distance_nearestNeighbor(self, tipo_distancia = "cos"):
         vizinhos_mais_proximos = self.nearestNeighbors()
