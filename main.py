@@ -18,10 +18,10 @@ def busca():
 
 def main():
     
-    busca()
+    #busca()
 
     txt = Texto.xml_to_object(18, 'uol')
-    print(txt.height_treeSentence())
+    print(txt.average_distance_nearestNeighbor(tipo_distancia="euclid"))
 
 
 

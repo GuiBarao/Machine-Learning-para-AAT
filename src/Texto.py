@@ -1110,7 +1110,49 @@ class Texto:
 
     #-----------76 Euclid-----------
 
-    #-----------76 Cos--------------
+   
 
-    #77. Clark and Evan’s distance to the nearest neighbor
-    #def clarkEvans_distance_neighbors_cos(self):
+
+    def nearestNeighbors(self, tipo_distancia = "cos"):
+
+        if tipo_distancia == "cos":
+            distancias = self.distancias_pontosVizinhos_cos()
+        elif tipo_distancia == "euclid": 
+            distancias = self.distancias_pontosVizinhos_euclid()
+        else:
+            raise ValueError
+        
+        distancia_primeiros_vizinhos = distancias[0]
+        distancia_ultimos_vizinhos = distancias[-1]
+
+        vizinhos_maisProximos = [distancia_primeiros_vizinhos, distancia_ultimos_vizinhos]
+
+        for i, distancia in enumerate(distancias):
+            
+            if (i == len(distancias) -1 ):
+                continue
+
+            if (distancia < distancias[i+1]):
+                vizinhos_maisProximos.append(distancia)
+            else:
+                vizinhos_maisProximos.append(distancias[i+1])
+        
+        return vizinhos_maisProximos
+
+            
+    #78. average distance to the nearest neighbor
+    def average_distance_nearestNeighbor(self, tipo_distancia = "cos"):
+        vizinhos_mais_proximos = self.nearestNeighbors()
+
+        return sum(vizinhos_mais_proximos)/len(vizinhos_mais_proximos)
+            
+
+
+
+
+
+    
+
+    
+
+
