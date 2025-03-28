@@ -13,15 +13,16 @@ def busca():
         txt = Texto.xml_to_object(id, 'uol')
         id += 1
         print(id)
-        print("---",txt.height_treeSentence(),"---")
+        print("---",txt.clarkEvan_distance_nearestNeighbor(tipo_distancia="euclid"),"---")
 
 
 def main():
     
-    #busca()
+    busca()
 
-    txt = Texto.xml_to_object(180, 'uol')
-    print(txt.cumulative_frequency_distribution(tipo_distancia="euclid"))
+    txt = Texto.xml_to_object(180, 'kaggle')
+    print(txt.redacao)
+    print(txt.janelas_deslizantes())
 
 
 

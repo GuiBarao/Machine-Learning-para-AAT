@@ -1059,10 +1059,15 @@ class Texto:
          
     #77. Clark and Evan’s distance to the nearest neighbor
     def clarkEvan_distance_nearestNeighbor(self, tipo_distancia = "cos"):
-        vizinhos_maisProximos = self.distances_nearestNeighbors(tipo_distancia=tipo_distancia)
+        r = self.distances_nearestNeighbors(tipo_distancia=tipo_distancia)
 
-        nPontos = len()
+        N = len(self.janelas_deslizantes())
+        
+        somatorio = 0
+        for i in range(N):
+            somatorio += r[i]
 
+        return somatorio / (N / (1 / (2 * math.sqrt(N))))
 
 
 
