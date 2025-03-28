@@ -20,8 +20,8 @@ def main():
     
     #busca()
 
-    txt = Texto.xml_to_object(18, 'uol')
-    print(txt.maxDifference_anyTwoPoints(tipo_distancia="euclid"))
+    txt = Texto.xml_to_object(180, 'uol')
+    print(txt.cumulative_frequency_distribution(tipo_distancia="euclid"))
 
 
 

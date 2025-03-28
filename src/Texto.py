@@ -309,7 +309,6 @@ class Texto:
         try:
             return (substantivos + preposicoes + participios) / (pronomes + adverbios + verbos)
         except:
-            print("denominador : ", (pronomes + adverbios + verbos))
             return 0
 
     #23. type-token-ratio
@@ -1031,12 +1030,12 @@ class Texto:
     
 
    
-    def nearestNeighbors(self, tipo_distancia = "cos"):
+    def distances_nearestNeighbors(self, tipo_distancia = "cos"):
 
         if tipo_distancia == "cos":
-            distancias = self.distancias_pontosVizinhos_cos()
+            distancias = self.distancias_pontosVizinhos(tipo_distancia=tipo_distancia)
         elif tipo_distancia == "euclid": 
-            distancias = self.distancias_pontosVizinhos_euclid()
+            distancias = self.distancias_pontosVizinhos(tipo_distancia=tipo_distancia)
         else:
             raise ValueError
         
@@ -1058,15 +1057,39 @@ class Texto:
         return vizinhos_maisProximos
 
          
+    #77. Clark and Evan’s distance to the nearest neighbor
+    def clarkEvan_distance_nearestNeighbor(self, tipo_distancia = "cos"):
+        vizinhos_maisProximos = self.distances_nearestNeighbors(tipo_distancia=tipo_distancia)
+
+        nPontos = len()
+
+
+
+
+
     #78. average distance to the nearest neighbor
     def average_distance_nearestNeighbor(self, tipo_distancia = "cos"):
-        vizinhos_mais_proximos = self.nearestNeighbors()
+        vizinhos_mais_proximos = self.distances_nearestNeighbors(tipo_distancia=tipo_distancia)
 
         return sum(vizinhos_mais_proximos)/len(vizinhos_mais_proximos)
             
 
+    #79. cumulative frequency distribution
+    def cumulative_frequency_distribution(self, tipo_distancia = "cos"):
+        distancia_media = self.average_distance_nearestNeighbor(tipo_distancia = tipo_distancia)
+        distancias_vizinhos_mais_proximos = self.distances_nearestNeighbors(tipo_distancia = tipo_distancia)
 
+        cont = 0
+        
+        for distancia in distancias_vizinhos_mais_proximos:
 
+        
+
+            if distancia <= distancia_media:
+                
+                cont += 1
+
+        return cont / len(distancias_vizinhos_mais_proximos)
 
 
     
