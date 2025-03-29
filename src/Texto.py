@@ -1096,6 +1096,34 @@ class Texto:
 
         return cont / len(distancias_vizinhos_mais_proximos)
 
+    def centroid_index(self):
+        janelas = self.janelas_deslizantes()
+        indice_centroid = int(len(janelas) / 2)
+
+        if(len(janelas) % 2 != 0):
+            indice_centroid += 1
+
+        return indice_centroid
+
+
+        
+    def distanceBetween_anyPoint_andCentroid (self, tipo_distancia="euclid"):
+        
+        janelas = self.janelas_deslizantes()
+        indexCentroid = self.centroid_index()
+
+        centroid = janelas[indexCentroid]
+        
+
+        distancias = [self.distancia_euclid(centroid, janela) for i, janela in enumerate(janelas) if i != indexCentroid]
+
+        return distancias
+
+
+    #81. average Euclidean distance between the centroid and each point
+    def averageEuclideanDistance_betweenCentroidAndEachPoint(self):
+        distancias_anyPoint_centroid = self.distanceBetween_anyPoint_andCentroid()
+        return sum(distancias_anyPoint_centroid)/len(distancias_anyPoint_centroid)
 
     
 

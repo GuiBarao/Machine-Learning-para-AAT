@@ -13,7 +13,7 @@ def busca():
         txt = Texto.xml_to_object(id, 'uol')
         id += 1
         print(id)
-        print("---",txt.clarkEvan_distance_nearestNeighbor(tipo_distancia="euclid"),"---")
+        print("---",txt.averageEuclideanDistance_betweenCentroidAndEachPoint(),"---")
 
 
 def main():
