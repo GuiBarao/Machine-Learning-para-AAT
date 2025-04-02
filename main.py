@@ -13,7 +13,7 @@ def busca():
         txt = Texto.xml_to_object(id, 'uol')
         id += 1
         print(id)
-        print("---",txt.averageEuclideanDistance_betweenCentroidAndEachPoint(),"---")
+        print("---",txt.coefficientEuclideanDistance_betweenCentroidAndEachPoint(),"---")
 
 
 def main():
@@ -23,12 +23,6 @@ def main():
     txt = Texto.xml_to_object(180, 'kaggle')
     print(txt.redacao)
     print(txt.janelas_deslizantes())
-
-
-
-    
-
-    
 
 
 if __name__ == '__main__':

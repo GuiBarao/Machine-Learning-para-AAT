@@ -1105,9 +1105,8 @@ class Texto:
 
         return indice_centroid
 
-
         
-    def distanceBetween_anyPoint_andCentroid (self, tipo_distancia="euclid"):
+    def distanceBetween_eachPoint_andCentroid (self, tipo_distancia="euclid"):
         
         janelas = self.janelas_deslizantes()
         indexCentroid = self.centroid_index()
@@ -1122,11 +1121,31 @@ class Texto:
 
     #81. average Euclidean distance between the centroid and each point
     def averageEuclideanDistance_betweenCentroidAndEachPoint(self):
-        distancias_anyPoint_centroid = self.distanceBetween_anyPoint_andCentroid()
+        distancias_anyPoint_centroid = self.distanceBetween_eachPoint_andCentroid()
         return sum(distancias_anyPoint_centroid)/len(distancias_anyPoint_centroid)
 
     
-
+    #82. Minimal and maximal Euclidean distance between the centroid and each point and their coefficient
+    def minimalEuclideanDistance_betweenCentroidAndEachPoint(self):
+        distancias = self.distanceBetween_eachPoint_andCentroid()
+        return min(distancias)    
     
+    #82. Minimal and maximal Euclidean distance between the centroid and each point and their coefficient
+    def maximalEuclideanDistance_betweenCentroidAndEachPoint(self):
+        distancias = self.distanceBetween_eachPoint_andCentroid()
+        return max(distancias)  
+    
+    #82. Minimal and maximal Euclidean distance between the centroid and each point and their coefficient
+    def coefficientEuclideanDistance_betweenCentroidAndEachPoint(self):
+        min = self.minimalEuclideanDistance_betweenCentroidAndEachPoint()
+        max = self.maximalEuclideanDistance_betweenCentroidAndEachPoint()
+
+        return max/min
+    
+    #83. standard distance
+    def standard_distance(self):
+        janelas = self.janelas_deslizantes()
+        N = len(janelas)
+
 
 
