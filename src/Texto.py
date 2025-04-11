@@ -1,11 +1,13 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
+import numpy as np
 import math
 import spacy
 import syllapy
 import math
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
+from scipy.spatial.distance import pdist, squareform
 
 
 class Texto:
@@ -1146,6 +1148,121 @@ class Texto:
     def standard_distance(self):
         janelas = self.janelas_deslizantes()
         N = len(janelas)
+        
+        vetorizador = TfidfVectorizer()
+        matriz = vetorizador.fit_transform(janelas).toarray() 
+
+        centroide = np.mean(matriz, axis=0)                    
+        distancias = np.linalg.norm(matriz - centroide, axis=1)  
+        sd = np.sqrt(np.sum(distancias ** 2) / N)
+
+        return sd
+    
+    #84. relative distance
+    def relative_distance(self):
+        dMax = self.maximalEuclideanDistance_betweenCentroidAndEachPoint()
+        sd = self.standard_distance()
+
+        return sd/dMax; 
+
+
+    #85. the determinant of the distance matrix.
+    def determinant_distance_matrix(self):
+        janelas = self.janelas_deslizantes()
+        vetorizador = TfidfVectorizer()
+        matriz = vetorizador.fit_transform(janelas).toarray()
+
+        dist_matrix = squareform(pdist(matriz, metric='euclidean'))
+
+        det = np.abs(np.linalg.det(dist_matrix))
+
+        return det   
+      
+
+    #86. Moran’s I
+    def morans_I (self) :
+        janelas = self.janelas_deslizantes()
+        vetorizador = TfidfVectorizer()
+        matriz = vetorizador.fit_transform(janelas).toarray()
+        N, n = matriz.shape
+        centroide = np.mean(matriz, axis=0)
+
+        W = np.zeros((N, N))
+        for i in range(N):
+            if i > 0: W[i, i-1] = 1
+            if i < N - 1: W[i, i+1] = 1
+        S = np.sum(W)
+
+        numerador_total = 0
+        for k in range(n):
+            Dk = matriz[:, k]
+            Dk_c = centroide[k]
+
+            num_k = np.sum([W[i, j] * (Dk[i] - Dk_c) * (Dk[j] - Dk_c)
+                            for i in range(N) for j in range(N)])
+            den_k = np.sum((Dk - Dk_c) ** 2)
+
+            if den_k != 0:
+                numerador_total += num_k / den_k
+
+            return (N / S) * (1 / n) * numerador_total
+
+
+
+    #87. Geary’s C
+    def gearys_C(self):
+        janelas = self.janelas_deslizantes()
+        vetorizador = TfidfVectorizer()
+        matriz = vetorizador.fit_transform(janelas).toarray()
+        N, n = matriz.shape
+        centroide = np.mean(matriz, axis=0)
+
+
+        W = np.zeros((N, N))
+        for i in range(N):
+            if i > 0: W[i, i-1] = 1
+            if i < N - 1: W[i, i+1] = 1
+        S = np.sum(W)
+
+        numerador_total = 0
+        for k in range(n):
+            Dk = matriz[:, k]
+            Dk_c = centroide[k]
+
+            num_k = np.sum([W[i, j] * (Dk[i] - Dk[j]) ** 2
+                            for i in range(N) for j in range(N)])
+            den_k = np.sum((Dk - Dk_c) ** 2)
+
+            if den_k != 0:
+                numerador_total += num_k / den_k
+
+        return ((N - 1) / (2 * S)) * (1 / n) * numerador_total
+
+
+    #88. Gettis’s G
+    def gettis_G(self):
+        janelas = self.janelas_deslizantes()
+        vetorizador = TfidfVectorizer()
+        matriz = vetorizador.fit_transform(janelas).toarray()
+        N, n = matriz.shape
+
+       
+        W = np.zeros((N, N))
+        for i in range(N):
+            if i > 0: W[i, i-1] = 1
+            if i < N - 1: W[i, i+1] = 1
+
+        soma_G = 0
+        for k in range(n):
+            Dk = matriz[:, k]
+            numerador = np.sum([W[i, j] * Dk[j] for i in range(N) for j in range(N)])
+            denominador = np.sum(Dk)
+
+            if denominador != 0:
+                soma_G += numerador / denominador
+
+        return soma_G / n
+
 
 
 

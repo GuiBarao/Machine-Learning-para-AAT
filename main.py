@@ -10,10 +10,10 @@ def busca():
     while(True):
 
 
-        txt = Texto.xml_to_object(id, 'uol')
+        txt = Texto.xml_to_object(id, 'kaggle')
         id += 1
         print(id)
-        print("---",txt.coefficientEuclideanDistance_betweenCentroidAndEachPoint(),"---")
+        print("---",txt.gettis_G(),"---")
 
 
 def main():
