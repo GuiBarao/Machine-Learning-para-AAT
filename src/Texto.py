@@ -185,7 +185,10 @@ class Texto:
             else:
                 if token.isalpha():
                     sentenca_aux.append(token)
-                
+        
+        if len(sentenca_aux) != 0 : 
+            sentencas.append(sentenca_aux)
+
         return sentencas
 
     #7. number of sentences
@@ -215,6 +218,8 @@ class Texto:
     #10. most frequent sentence length 
     def mostFrequent_sentenceLen(self):
         frases = self.sentences()
+
+
         tamanhos = [len(frase) for frase in frases]
         
         dict_frequencias = {tam : tamanhos.count(tam) for tam in set(tamanhos)}
@@ -288,7 +293,8 @@ class Texto:
         numerador = math.log(self.nWords(), 10)
         denominador = math.log(2 - math.log(self.nUniqueWords(), 10) / math.log(self.nWords(), 10), 10)
 
-        return  numerador / denominador
+        return 0 if denominador == 0 else numerador / denominador
+        
 
     def n_substantivos(self):
         return self.count_of_tag("NOUN")
