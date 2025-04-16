@@ -247,6 +247,7 @@ class Texto:
         tokens = self.tokenizado(exclui_stopwords=True, exclui_especiais=True, lower=True)
 
         freq = pd.read_csv('data\\frequencias.csv')
+
         return self.nWords() - freq['palavra'].isin(tokens).sum()
 
     #14. Gunning Fog index

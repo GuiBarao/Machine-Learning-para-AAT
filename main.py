@@ -21,13 +21,16 @@ def main():
     #busca()
 
     modelo = Modelo("geral")
-    modelo.extrair_leiturabilidade("data/atributos/kaggle/leiturabilidade.csv", "kaggle")
     modelo.extrair_leiturabilidade("data/atributos/uol/leiturabilidade.csv", "uol")
+    modelo.extrair_leiturabilidade("data/atributos/kaggle/leiturabilidade.csv", "kaggle")
 
 
-    #txt = Texto.xml_to_object(2, 'kaggle')
-    #print(txt.redacao)
-    #print(txt.word_variationIndex())
+    #txt = Texto.xml_to_object(1019, 'uol')
+  
+    #print(txt.simple_gobbledygook())
+  
+
+
 
 
     #modelo.extrair_sofisticacao_lexica("data/atributos/kaggle/sof_lexica.csv", "kaggle")
