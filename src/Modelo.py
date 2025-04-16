@@ -90,8 +90,36 @@ class Modelo:
 
         np.savetxt( caminho, np.array(atributos),  delimiter=",", fmt="%.5f", header=header)
 
-    
+    def extrair_diversidade_lexica(self, caminho, corpus):
+        id = 0
 
+        atributos = []
+        
+        while(True):
+            try:
+                print(id)
+                txt = Modelo.xml_to_object(id, corpus)
+
+                linha = []
+
+                linha.append(txt.typeToken_ratio())
+                linha.append(txt.guiraud_index())
+                linha.append(txt.yule_K())
+                linha.append(txt.hapax_legomena())
+                linha.append(txt.advanced_guiraud())
+                linha.append(float(txt.avaliacao))
+
+                id += 1
+
+                atributos.append(linha)
+
+            except:
+                break
+ 
+
+        header = "TypeTokenRatio, GuiraudsIndex, Yule's_K, HapaxLegonema, AdvancedGuiraud, Avaliacao"
+
+        np.savetxt( caminho, np.array(atributos),  delimiter=",", fmt="%.5f", header=header)
 
     @staticmethod
     def diretorio_corpus(corpus):

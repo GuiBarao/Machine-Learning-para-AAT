@@ -21,20 +21,19 @@ def main():
     #busca()
 
     modelo = Modelo("geral")
-    modelo.extrair_leiturabilidade("data/atributos/uol/leiturabilidade.csv", "uol")
-    modelo.extrair_leiturabilidade("data/atributos/kaggle/leiturabilidade.csv", "kaggle")
 
+    modelo.extrair_diversidade_lexica("data/atributos/kaggle/diversidade_lexica.csv", "kaggle")
+    modelo.extrair_diversidade_lexica("data/atributos/uol/diversidade_lexica.csv", "uol")
 
     #txt = Texto.xml_to_object(1019, 'uol')
-  
     #print(txt.simple_gobbledygook())
   
 
+    #modelo.extrair_sofisticacao_lexica("data/atributos/kaggle/sofisticacao_lexica.csv", "kaggle")
+    #modelo.extrair_sofisticacao_lexica("data/atributos/uol/sofisticacao_lexica.csv", "uol")
 
-
-
-    #modelo.extrair_sofisticacao_lexica("data/atributos/kaggle/sof_lexica.csv", "kaggle")
-    #modelo.extrair_sofisticacao_lexica("data/atributos/uol/sof_lexica.csv", "uol")
+    #modelo.extrair_leiturabilidade("data/atributos/uol/leiturabilidade.csv", "uol")
+    #modelo.extrair_leiturabilidade("data/atributos/kaggle/leiturabilidade.csv", "kaggle")
 
 
 if __name__ == '__main__':

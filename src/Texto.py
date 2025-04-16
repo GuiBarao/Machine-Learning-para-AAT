@@ -326,7 +326,7 @@ class Texto:
     
     #24. Guiraud’s index
     def guiraud_index(self):
-        return self.nWordsTypes() / math.sqrt(self.nWords())
+        return self.nWordTypes() / math.sqrt(self.nWords())
     
     #25. Yule’s K
     def yule_K(self):
