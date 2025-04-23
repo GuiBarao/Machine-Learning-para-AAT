@@ -53,7 +53,6 @@ class Modelo:
 
         np.savetxt( caminho, np.array(atributos),  delimiter=",", fmt="%.5f", header=header)
     
-
     def extrair_leiturabilidade(self, caminho, corpus):
         id = 0
 
@@ -120,6 +119,246 @@ class Modelo:
         header = "TypeTokenRatio, GuiraudsIndex, Yule's_K, HapaxLegonema, AdvancedGuiraud, Avaliacao"
 
         np.savetxt( caminho, np.array(atributos),  delimiter=",", fmt="%.5f", header=header)
+
+    def extrair_gramatica(self, caminho, corpus):
+        id = 0
+
+        atributos = []
+        
+        while(True):
+            try:
+                print(id)
+                txt = Modelo.xml_to_object(id, corpus)
+
+                linha = []
+
+                linha.append(txt.n_differents_posTags())
+                linha.append(txt.height_treeSentence())
+                linha.append(float(txt.avaliacao))
+
+                id += 1
+
+                atributos.append(linha)
+
+            except:
+                break
+ 
+
+        header = "nDifferentsPosTags, HeightTreeSentence, Avaliacao"
+
+        np.savetxt( caminho, np.array(atributos),  delimiter=",", fmt="%.5f", header=header)
+
+    def extrair_numero_de_cada_pos_tag(self, caminho, corpus):
+        id = 0
+
+        atributos = []
+        
+        while(True):
+            try:
+                print(id)
+                txt = Modelo.xml_to_object(id, corpus)
+
+                linha = []
+
+                linha.append(txt.n_coordinating_conjunction())
+                linha.append(txt.n_numeral())
+                linha.append(txt.n_determiner())
+                linha.append(txt.n_existencial())
+                linha.append(txt.n_subordinatingConjunction())
+                linha.append(txt.n_adjective())
+                linha.append(txt.n_comparativeAdjective())
+                linha.append(txt.n_superlativeAdjective())
+                linha.append(txt.n_ordinalAdjective_or_numeral())
+                linha.append(txt.n_modalAuxiliary())
+                linha.append(txt.n_singular_or_massCommun_noun())
+                linha.append(txt.n_pluralCommonNoun())
+                linha.append(txt.n_preposition())
+                linha.append(txt.n_participle())
+                linha.append(txt.n_predeterminer())
+                linha.append(txt.n_genitiveMarker())
+                linha.append(txt.n_personalPronoun())
+                linha.append(txt.n_possessivePronoun())
+                linha.append(txt.n_adverb())
+                linha.append(txt.n_comparativeAdverb())
+                linha.append(txt.n_superlativeAdverbs())
+                linha.append(txt.n_preposition_or_infinitive())
+                linha.append(txt.n_verb_baseForm())
+                linha.append(txt.n_verb_pastTense())
+                linha.append(txt.n_verb_gerund())
+                linha.append(txt.n_verb_pastParticiple())
+                linha.append(txt.n_verb_thirdPersonSingPresent())
+                linha.append(txt.n_whDeterminer())
+                linha.append(txt.n_whAdverb())
+                linha.append(txt.n_whPronoun())
+
+                linha.append(float(txt.avaliacao))
+
+                id += 1
+
+                atributos.append(linha)
+            except:
+                break
+
+
+        header = "coordinating_conjunction, numeral, determiner, existencial, subordinatingConjunction, " \
+        "adjective, comparativeAdjective, superlativeAdjective, ordinalAdjective_or_numeral, modalAuxiliary, " \
+        "singular_or_massCommun_noun, pluralCommonNoun, preposition, participle, predeterminer, genitiveMarker, " \
+        "personalPronoun, possessivePronoun, adverb, comparativeAdverb, superlativeAdverbs, preposition_or_infinitive, " \
+        "n_verb_baseForm, n_verb_pastTense, n_verb_gerund, n_verb_pastParticiple, n_verb_thirdPersonSingPresent, " \
+        "n_whDeterminer, n_whAdverb, whPronoun"
+
+
+        np.savetxt( caminho, np.array(atributos),  delimiter=",", header=header, fmt='%d')
+
+    def extrair_mecanica(self, caminho, corpus):
+        id = 0
+
+        atributos = []
+        
+        while(True):
+            try:
+                print(id)
+                txt = Modelo.xml_to_object(id, corpus)
+
+                linha = []
+
+                linha.append(txt.n_speelChecking_errors())
+                linha.append(txt.n_capitalization_errors())
+                linha.append(float(txt.avaliacao))
+
+                id += 1
+
+                atributos.append(linha)
+
+            except:
+                break
+
+
+ 
+
+        header = "n_speelChecking_errors, n_capitalization_errors, Avaliacao"
+
+        np.savetxt( caminho, np.array(atributos),  delimiter=",", fmt="%.5f", header=header)
+
+    def extrair_coerencia(self, caminho, corpus):
+        id = 0
+
+        atributos = []
+        
+        while(True):
+            try:
+                print(id)
+                txt = Modelo.xml_to_object(id, corpus)
+
+                linha = []
+
+                linha.append(txt.averageDistance_neighboringPoints(tipo_distancia="cos"))
+                linha.append(txt.averageDistance_neighboringPoints(tipo_distancia="euclid"))
+
+                linha.append(txt.minDistance_neighboringPoints(tipo_distancia="cos"))
+                linha.append(txt.maxDistance_neighboringPoints(tipo_distancia="cos"))
+                linha.append(txt.quotientDistance_neighboringPoints(tipo_distancia="cos"))
+
+                linha.append(txt.minDistance_neighboringPoints(tipo_distancia="euclid"))
+                linha.append(txt.maxDistance_neighboringPoints(tipo_distancia="euclid"))
+                linha.append(txt.quotientDistance_neighboringPoints(tipo_distancia="euclid"))
+
+
+                linha.append(txt.averageDistance_anyTwoPoints(tipo_distancia="cos"))
+                linha.append(txt.averageDistance_anyTwoPoints(tipo_distancia="euclid"))
+
+
+                linha.append(txt.maxDifference_anyTwoPoints(tipo_distancia="cos"))
+                linha.append(txt.maxDifference_anyTwoPoints(tipo_distancia="euclid"))
+
+
+                linha.append(txt.clarkEvan_distance_nearestNeighbor(tipo_distancia="cos"))
+                linha.append(txt.clarkEvan_distance_nearestNeighbor(tipo_distancia="euclid"))
+
+                linha.append(txt.average_distance_nearestNeighbor(tipo_distancia="cos"))
+                linha.append(txt.average_distance_nearestNeighbor(tipo_distancia="euclid"))
+
+                linha.append(txt.cumulative_frequency_distribution(tipo_distancia="cos"))
+                linha.append(txt.cumulative_frequency_distribution(tipo_distancia="euclid"))
+
+           
+                linha.append(float(txt.avaliacao))
+
+                id += 1
+
+                atributos.append(linha)
+
+                
+
+            except:
+                break
+
+        np.savetxt( caminho, np.array(atributos),  delimiter=",", fmt="%.5f")
+
+    def extrair_dadosEspaciais(self, caminho, corpus):
+        id = 0
+
+        atributos = []
+        
+        while(True):
+            try:
+                print(id)
+                txt = Modelo.xml_to_object(id, corpus)
+
+                linha = []
+
+                linha.append(txt.averageEuclideanDistance_betweenCentroidAndEachPoint())
+
+                linha.append(txt.minimalEuclideanDistance_betweenCentroidAndEachPoint())
+                linha.append(txt.maximalEuclideanDistance_betweenCentroidAndEachPoint())
+                linha.append(txt.coefficientEuclideanDistance_betweenCentroidAndEachPoint())
+
+                linha.append(txt.standard_distance())
+                linha.append(txt.relative_distance())
+                linha.append(txt.determinant_distance_matrix())
+                
+                linha.append(float(txt.avaliacao))
+
+                id += 1
+
+                atributos.append(linha)
+
+            except:
+                break
+
+
+ 
+        np.savetxt( caminho, np.array(atributos),  delimiter=",", fmt="%.5f")
+
+    def extrair_autocorrelacaoEspacial(self, caminho, corpus):
+        id = 0
+
+        atributos = []
+        
+        while(True):
+            try:
+                print(id)
+                txt = Modelo.xml_to_object(id, corpus)
+
+                linha = []
+
+                linha.append(txt.morans_I())
+                linha.append(txt.gettis_G())
+                linha.append(txt.gearys_C())
+                
+                linha.append(float(txt.avaliacao))
+
+                id += 1
+
+                atributos.append(linha)
+             
+
+            except:
+                break
+
+
+ 
+        np.savetxt( caminho, np.array(atributos),  delimiter=",", fmt="%.5f")
 
     @staticmethod
     def diretorio_corpus(corpus):

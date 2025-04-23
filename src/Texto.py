@@ -442,9 +442,6 @@ class Texto:
 
         return count
 
-    #37. preposition/subordinating conjunction 
-    def n_preposition(self):
-        return self.count_of_tag("ADP")
     
     #37. preposition/subordinating conjunction 
     def n_subordinatingConjunction(self):
@@ -519,7 +516,7 @@ class Texto:
 
 
     #41. ordinal adjective or numeral
-    def n_numeral(self):
+    def n_ordinalAdjective_or_numeral(self):
 
         tokens = Texto.pln(self.redacao)
 
@@ -902,7 +899,7 @@ class Texto:
 
 
     
-    #Atributos de distância (Cos) e (Euclid)
+    #Atributos de distância (Cos e Euclid)
 
     def janelas_deslizantes(self):
         
@@ -941,13 +938,19 @@ class Texto:
 
     def similaridade_cosseno(self, texto1, texto2):
         vetorizador = TfidfVectorizer()
-        matriz = vetorizador.fit_transform([texto1,texto2])
+        try:
+            matriz = vetorizador.fit_transform([texto1,texto2])
+        except(ValueError):
+            return None
         similaridade = cosine_similarity(matriz[0:1], matriz[1:2])
         return float(similaridade[0][0])
 
     def distancia_euclid(self, texto1, texto2):
         vetorizador = TfidfVectorizer()
-        matriz = vetorizador.fit_transform([texto1,texto2])
+        try:
+            matriz = vetorizador.fit_transform([texto1,texto2])
+        except(ValueError):
+            return None
         distancias = euclidean_distances(matriz[0:1], matriz[1:2])
         return float(distancias[0][0])
 
@@ -964,10 +967,17 @@ class Texto:
             
             if(tipo_distancia == "cos"):
                 similaridade = self.similaridade_cosseno(janelas[i-1], janela)
-                distancia = 1 - similaridade
+                
+                if(similaridade): 
+                    distancia = 1 - similaridade
+                else:
+                    distancia = 0
 
             elif(tipo_distancia == "euclid"):
                 distancia = self.distancia_euclid(janelas[i-1], janela)
+                if(not distancia): 
+                    distancia = 0
+
 
             else:
                 raise ValueError
@@ -997,6 +1007,10 @@ class Texto:
     def quotientDistance_neighboringPoints(self, tipo_distancia = "cos"):
         menor = self.minDistance_neighboringPoints(tipo_distancia=tipo_distancia)
         maior = self.maxDistance_neighboringPoints(tipo_distancia=tipo_distancia)
+
+        if(menor == 0):
+            return 0
+
         return maior/menor
     
 
@@ -1013,10 +1027,15 @@ class Texto:
 
                 if(tipo_distancia == "cos"):
                     similaridade = (self.similaridade_cosseno(janela, janelas[j]))
-                    distancia = 1 - similaridade
+                    if(similaridade): 
+                        distancia = 1 - similaridade
+                    else:
+                        distancia = 0
 
                 elif(tipo_distancia == "euclid"):
                     distancia = self.distancia_euclid(janela, janelas[j])
+                    if(not distancia): 
+                        distancia = 0
                 
                 else:
                     raise ValueError
@@ -1038,7 +1057,6 @@ class Texto:
         return max(distancias)
     
 
-   
     def distances_nearestNeighbors(self, tipo_distancia = "cos"):
 
         if tipo_distancia == "cos":
@@ -1123,7 +1141,19 @@ class Texto:
         centroid = janelas[indexCentroid]
         
 
-        distancias = [self.distancia_euclid(centroid, janela) for i, janela in enumerate(janelas) if i != indexCentroid]
+        distancias = []
+        
+        for i, janela in enumerate(janelas):
+
+            if i == indexCentroid:
+                continue
+
+            distancia = self.distancia_euclid(centroid, janela)
+            if(not distancia):
+                distancia = 0
+
+            distancias.append(distancia)
+
 
         return distancias
 
@@ -1148,6 +1178,9 @@ class Texto:
     def coefficientEuclideanDistance_betweenCentroidAndEachPoint(self):
         min = self.minimalEuclideanDistance_betweenCentroidAndEachPoint()
         max = self.maximalEuclideanDistance_betweenCentroidAndEachPoint()
+
+        if(not min):
+           return 0
 
         return max/min
     
