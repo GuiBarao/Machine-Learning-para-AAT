@@ -1,46 +1,63 @@
 import sys
 sys.path.insert(0, 'src')
 
-from Texto import Texto
 from Modelo import Modelo
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+import joblib
+
+
+def divisao_features(caminho_csv):
+
+    array = np.loadtxt(caminho_csv, delimiter=",")
+
+    #remove a coluna de avaliação (ultima)  
+    x = array[:, :-1]
+    y = array[:, -1]    
+
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=62)
+
+    return (x_train, x_test, y_train, y_test)
+
+def treinar_modelo(atributos, avaliacao):
+    modelo = RandomForestRegressor(
+    n_estimators=200,
+    max_depth=10,
+    min_samples_split=5,
+    min_samples_leaf=2,
+    max_features='sqrt',
+    bootstrap=True,
+    random_state=317)
+
+    modelo.fit(atributos,avaliacao)
+
+    return modelo 
+
+def criar_modelo(caminho_csv, caminho_modelo):
+
+    x_treino, x_teste, y_treino, y_teste = divisao_features(caminho_csv)
+    modelo = treinar_modelo(x_treino, y_treino)
+
+    joblib.dump(modelo, caminho_modelo)
+
+    return modelo.score(x_teste, y_teste)
 
 
 def main():
 
-    pass
+    #tipos = ["autocorrelacao_espacial", "coerencia", "dados_espaciais",
+    #    "diversidade_lexica", "gramatica", "leiturabilidade", "mecanica", "pos_tags", "sofisticacao_lexica"]
+    
+    #modelo = Modelo()
 
+    #modelo.extrair_geral(tipos, "uol")
 
-    #txt = Texto.xml_to_object(978, 'kaggle')
+    corpus = "uol"
+    avaliacao = criar_modelo(f"data/atributos/{corpus}/geral.csv", f"modelos_treinados/{corpus}/geral.pkl")
+    print(avaliacao)
+    
 
-
-    #modelo = Modelo("geral")
-
-    #modelo.extrair_sofisticacao_lexica("data/atributos/kaggle/sofisticacao_lexica.csv", "kaggle")
-    #modelo.extrair_sofisticacao_lexica("data/atributos/uol/sofisticacao_lexica.csv", "uol")
-
-    #modelo.extrair_leiturabilidade("data/atributos/uol/leiturabilidade.csv", "uol")
-    #modelo.extrair_leiturabilidade("data/atributos/kaggle/leiturabilidade.csv", "kaggle")
-
-    #modelo.extrair_diversidade_lexica("data/atributos/kaggle/diversidade_lexica.csv", "kaggle")
-    #modelo.extrair_diversidade_lexica("data/atributos/uol/diversidade_lexica.csv", "uol")
-
-    #modelo.extrair_gramatica("data/atributos/kaggle/gramatica.csv", "kaggle")
-    #modelo.extrair_gramatica("data/atributos/uol/gramatica.csv", "uol")
-
-    #modelo.extrair_numero_de_cada_pos_tag("data/atributos/kaggle/pos_tags.csv", "kaggle")
-    #modelo.extrair_numero_de_cada_pos_tag("data/atributos/uol/pos_tags.csv", "uol")
-
-    #modelo.extrair_mecanica("data/atributos/kaggle/mecanica.csv", "kaggle")
-    #modelo.extrair_mecanica("data/atributos/uol/mecanica.csv", "uol")
-
-    #modelo.extrair_coerencia("data/atributos/kaggle/coerencia.csv", "kaggle")
-    #modelo.extrair_coerencia("data/atributos/uol/coerencia.csv", "uol")
-
-    #modelo.extrair_dadosEspaciais("data/atributos/kaggle/dados_espaciais.csv", "kaggle")
-    #modelo.extrair_dadosEspaciais("data/atributos/uol/dados_espaciais.csv", "uol")
-
-    #modelo.extrair_autocorrelacaoEspacial("data/atributos/kaggle/autocorrelacao_espacial.csv", "kaggle")
-    #modelo.extrair_autocorrelacaoEspacial("data/atributos/uol/autocorrelacao_espacial.csv", "uol")
 
 if __name__ == '__main__':
     main()

@@ -287,9 +287,6 @@ class Modelo:
                 id += 1
 
                 atributos.append(linha)
-
-                
-
             except:
                 break
 
@@ -359,6 +356,33 @@ class Modelo:
 
  
         np.savetxt( caminho, np.array(atributos),  delimiter=",", fmt="%.5f")
+
+    def extrair_geral (self, tipos, corpus):
+
+        array_geral = None
+
+        y_array_geral = None
+
+        for tipo in tipos:
+            array = np.loadtxt(f"data/atributos/{corpus}/{tipo}.csv", delimiter=",")
+            x = array[:, :-1]  
+
+            if array_geral is None:
+                array_geral = x
+            else:
+                array_geral = np.hstack((array_geral, x))
+
+            if(y_array_geral is None):
+                y_array_geral =  array[:, -1]  
+
+
+        y_array_geral = y_array_geral.reshape(-1, 1)
+        array_geral = np.hstack((array_geral, y_array_geral))
+        np.savetxt(f"data/atributos/{corpus}/geral.csv", array_geral,  delimiter=",", fmt="%.5f")
+
+
+        
+
 
     @staticmethod
     def diretorio_corpus(corpus):
