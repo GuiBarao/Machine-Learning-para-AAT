@@ -39,10 +39,9 @@ def criar_modelo(caminho_csv, caminho_modelo):
     x_treino, x_teste, y_treino, y_teste = divisao_features(caminho_csv)
     modelo = treinar_modelo(x_treino, y_treino)
 
-    joblib.dump(modelo, caminho_modelo)
+    #joblib.dump(modelo, caminho_modelo)
 
     return modelo.score(x_teste, y_teste)
-
 
 def main():
 
@@ -53,9 +52,12 @@ def main():
 
     #modelo.extrair_geral(tipos, "uol")
 
-    corpus = "uol"
+    corpus = "kaggle"
     avaliacao = criar_modelo(f"data/atributos/{corpus}/geral.csv", f"modelos_treinados/{corpus}/geral.pkl")
     print(avaliacao)
+
+    #modelo_carregado = joblib.load("modelos_treinados\kaggle\geral.pkl")
+
     
 
 
