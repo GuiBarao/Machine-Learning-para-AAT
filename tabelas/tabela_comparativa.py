@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import cohen_kappa_score
 import joblib
 from fpdf import FPDF
 
@@ -29,13 +30,15 @@ def cria_tabela(dados, nome_arquivo):
 
     # header
     pdf.set_font("Arial", "B", 12)
+    pdf.cell(50, 10, "Indice", border=1, align="C")
     pdf.cell(50, 10, "Avaliador Humano", border=1, align="C")
-    pdf.cell(50, 10, "Avaliacao Sistema", border=1, align="C")
+    pdf.cell(50, 10, "Avaliação Sistema", border=1, align="C")
     pdf.ln()
 
     # dados
     pdf.set_font("Arial", size=12)
-    for humano, sistema in dados:
+    for i, humano, sistema in dados:
+        pdf.cell(50, 10, str(i), border=1, align="C")
         pdf.cell(50, 10, str(humano), border=1, align="C")
         pdf.cell(50, 10, str(sistema), border=1, align="C")
         pdf.ln()
@@ -44,19 +47,37 @@ def cria_tabela(dados, nome_arquivo):
     print(f"PDF salvo como {nome_arquivo}")
 
 def comparativo_humano_sistema(corpus):
+    humanas, sistema = lista_avaliacoes(corpus)
+
+    dados_tabela = [(i, humanas[i], sistema[i])  for i in range(len(sistema))]
+
+    cria_tabela(dados_tabela, f"tabelas\\pdfs\\comparativo_geral_{corpus}.pdf")
+
+def lista_avaliacoes(corpus):
     extratos = divisao_features(f"data\\atributos\\{corpus}\\geral.csv")
     x_teste = extratos[1]
-    y_teste = extratos[3] #lista de avaliações dos avaliadores humanos
+    avaliacoes_humanas = extratos[3] #lista de avaliações dos avaliadores humanos
 
     modelo = joblib.load(f"modelos_treinados\\{corpus}\\geral.pkl")
-    predicoes = modelo.predict(x_teste) #lista de avaliações do sistema
+    avaliacoes_sistema = modelo.predict(x_teste) #lista de avaliações do sistema
 
-    dados_tabela = [(y_teste[i], predicoes[i])  for i in range(len(predicoes))]
+    avaliacoes_humanas = [int(avaliacoes_humanas[i]) for i in range(len(avaliacoes_humanas))]
+    avaliacoes_sistema = [int(avaliacoes_sistema[i]) for i in range(len(avaliacoes_sistema))]
 
-    cria_tabela(dados_tabela, f"comparativo_geral_{corpus}.pdf")
+    return (avaliacoes_humanas, avaliacoes_sistema)
+
+def kappa_quadratico(corpus):
+
+    humanas, sistema = lista_avaliacoes(corpus)
+
+    resultado = cohen_kappa_score(humanas, sistema, weights='quadratic')
+
+    return resultado
 
 def main():
     comparativo_humano_sistema("kaggle")
+    comparativo_humano_sistema("uol")
+    #print(kappa_quadratico("kaggle"))
 
 
     
