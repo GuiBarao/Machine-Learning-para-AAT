@@ -35,7 +35,7 @@ def cria_graficos(corpus):
     plt.ylabel('Avaliação recebida')
     plt.xticks(np.arange(0, len(labels), 10), rotation=90, fontsize=6)    
     plt.tight_layout()
-    plt.savefig(f"tabelas\\graficos\\{corpus}\\sistema.pdf", format="pdf" )
+    plt.savefig(f"tabelas\\graficos\\{corpus}\\sistema.pdf", format="pdf")
 
     plt.close()
 
