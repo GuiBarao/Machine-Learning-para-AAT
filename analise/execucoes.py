@@ -28,9 +28,6 @@ def execucoes(corpus):
 
     
 
-  
-
-
 def main():
     #execucoes("kaggle")
     execucoes("uol")
