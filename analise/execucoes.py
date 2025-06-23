@@ -24,7 +24,7 @@ def execucoes(corpus):
 
     df = pd.DataFrame(matriz_resultados)
 
-    df.to_excel(f"analise\\planilhas\\{corpus}.xlsx")
+    df.to_excel(f"analise\\planilhas\\{corpus}\\{corpus}.xlsx")
 
     
 

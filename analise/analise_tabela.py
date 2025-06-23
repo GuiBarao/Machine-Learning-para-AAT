@@ -12,31 +12,59 @@ def matrizes_avaliacoes(corpus):
 
     return(array_humanas, array_sistema)
 
+def quantidade_agrupamento(avaliacoes:list, min:int, max:int) -> int:
+    return len(list(filter(lambda x: (x >= min and x <= max), avaliacoes)))
+
 def cria_graficos(corpus):
     humanas, sistema = lista_avaliacoes(corpus)
 
-    labels = [str(i) for i in range(len(humanas))]
+    dados_graficoHumano = {
+        "0-100": quantidade_agrupamento(humanas, 0, 100),
+        "101-200": quantidade_agrupamento(humanas, 101, 200),
+        "201-300": quantidade_agrupamento(humanas, 201, 300),
+        "301-400": quantidade_agrupamento(humanas, 301, 400),
+        "401-500": quantidade_agrupamento(humanas, 401, 500),
+        "501-600": quantidade_agrupamento(humanas, 501, 600),
+        "601-700": quantidade_agrupamento(humanas, 601, 700),
+        "701-800": quantidade_agrupamento(humanas, 701, 800),
+        "801-900": quantidade_agrupamento(humanas, 801, 900),
+        "901-1000": quantidade_agrupamento(humanas, 901, 1000),
+    }
+
+    dados_graficoSistema = {
+        "0-100": quantidade_agrupamento(sistema, 0, 100),
+        "101-200": quantidade_agrupamento(sistema, 101, 200),
+        "201-300": quantidade_agrupamento(sistema, 201, 300),
+        "301-400": quantidade_agrupamento(sistema, 301, 400),
+        "401-500": quantidade_agrupamento(sistema, 401, 500),
+        "501-600": quantidade_agrupamento(sistema, 501, 600),
+        "601-700": quantidade_agrupamento(sistema, 601, 700),
+        "701-800": quantidade_agrupamento(sistema, 701, 800),
+        "801-900": quantidade_agrupamento(sistema, 801, 900),
+        "901-1000": quantidade_agrupamento(sistema, 901, 1000)
+    }
 
     map_corpus = {"kaggle" : "Ensino Fundamental", "uol":"Ensino Médio"}
 
-
-    plt.bar(labels, humanas)
+    
+    plt.bar(list(dados_graficoHumano.keys()), list(dados_graficoHumano.values()))
     plt.title(f'Avaliações de textos do {map_corpus[corpus]} dada por humanos')
-    plt.xlabel('Indice da avaliação')
-    plt.ylabel('Avaliação recebida')
-    plt.xticks(np.arange(0, len(labels), 10), rotation=90, fontsize=6)    
+    plt.xlabel('Intervalo de avaliação')
+    plt.ylabel('Quantidade de textos avaliados no intervalo')
+    plt.xticks(fontsize=6)    
     plt.tight_layout()
-    plt.savefig(f"tabelas\\graficos\\{corpus}\\humanas.pdf", format="pdf" )
+    plt.savefig(f"analise\\graficos\\{corpus}\\humanas.pdf", format="pdf" )
+    
 
     plt.close()
 
-    plt.bar(labels, sistema)
+    plt.bar(list(dados_graficoSistema.keys()), list(dados_graficoSistema.values()))
     plt.title(f'Avaliações de textos do {map_corpus[corpus]} dada pela sistema')
-    plt.xlabel('Indice da avaliação')
-    plt.ylabel('Avaliação recebida')
-    plt.xticks(np.arange(0, len(labels), 10), rotation=90, fontsize=6)    
+    plt.xlabel('Intervalo de avaliação')
+    plt.ylabel('Quantidade de textos avaliados no intervalo')
+    plt.xticks(fontsize=6)
     plt.tight_layout()
-    plt.savefig(f"tabelas\\graficos\\{corpus}\\sistema.pdf", format="pdf")
+    plt.savefig(f"analise\\graficos\\{corpus}\\sistema.pdf", format="pdf")
 
     plt.close()
 
@@ -61,8 +89,8 @@ def main():
     #print(medias("uol"))    #humana = 480.59149722735674 | sistema = 467.13863216266174
     #print(medias("kaggle")) #humana = 502.7734627831715  | sistema = 505.0129449838188
 
-    #cria_graficos("kaggle")
-    #cria_graficos("uol")
+    cria_graficos("kaggle")
+    cria_graficos("uol")
 
     #print(medianas("kaggle")) #humana = 500.0 | sistema = 528.0
     #print(medianas("uol")) #humana = 500.0 | sistema = 473.0
