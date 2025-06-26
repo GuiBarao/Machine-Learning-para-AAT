@@ -16,9 +16,7 @@ def R_2(humanas, sistema):
     return r2_score(humanas,sistema)
 
 def kappa_quadratico(humanas, sistema: list[int]) -> float:
-
     return cohen_kappa_score(humanas, sistema, weights="quadratic")
-
 
 
 def cria_planilha(corpus:str):
