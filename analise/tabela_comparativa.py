@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import cohen_kappa_score
 import joblib
 from fpdf import FPDF
+from typing import Tuple, List
 
 
 def divisao_features(caminho_csv):
@@ -54,11 +55,11 @@ def comparativo_humano_sistema(corpus):
     cria_tabela(dados_tabela, f"tabelas\\pdfs\\comparativo_geral_{corpus}.pdf")
 
 def lista_avaliacoes(corpus):
-    extratos = divisao_features(f"data\\atributos\\{corpus}\\geral.csv")
+    extratos = divisao_features(f"testaNovoModelo\\atributos\\{corpus}\\geralFiltrado.csv")
     x_teste = extratos[1]
     avaliacoes_humanas = extratos[3] #lista de avaliações dos avaliadores humanos
 
-    modelo = joblib.load(f"modelos_treinados\\{corpus}\\geral.pkl")
+    modelo = joblib.load(f"testaNovoModelo\\{corpus}\\geral.pkl")
     avaliacoes_sistema = modelo.predict(x_teste) #lista de avaliações do sistema
 
     avaliacoes_humanas = [int(avaliacoes_humanas[i]) for i in range(len(avaliacoes_humanas))]
@@ -74,10 +75,34 @@ def kappa_quadratico(corpus):
 
     return resultado
 
+def porcentagem_avaliacoes_intervalo(lista_avaliacoes: List, intervalo: Tuple[int, int]) -> int:
+    
+    quantidadeAvaliacoes = len([avaliacao for avaliacao in lista_avaliacoes 
+            if avaliacao >= intervalo[0] and avaliacao <= intervalo[1]])
+    
+    totalAvaliacoes = len(lista_avaliacoes)
+    
+    return (quantidadeAvaliacoes * 100) / totalAvaliacoes
+
+def testeProporcao():
+    humanosUOL, sistemaUOL = lista_avaliacoes("uol")
+    humanosKaggle, sistemaKaggle = lista_avaliacoes("kaggle")
+
+    intervalosTeste = {"baixas":(0,400), "medias":(401,700), "altas":(701,1000)}
+
+    return {"uol": [porcentagem_avaliacoes_intervalo(sistemaUOL, intervalosTeste["baixas"]),
+                                porcentagem_avaliacoes_intervalo(sistemaUOL, intervalosTeste["medias"]),
+                                porcentagem_avaliacoes_intervalo(sistemaUOL, intervalosTeste["altas"])],
+
+                    "kaggle": [porcentagem_avaliacoes_intervalo(sistemaKaggle, intervalosTeste["baixas"]),
+                                   porcentagem_avaliacoes_intervalo(sistemaKaggle, intervalosTeste["medias"]),
+                                   porcentagem_avaliacoes_intervalo(sistemaKaggle, intervalosTeste["altas"])]}
+
 def main():
-    comparativo_humano_sistema("kaggle")
-    comparativo_humano_sistema("uol")
-    #print(kappa_quadratico("kaggle"))
+
+    proporcoes = testeProporcao()
+
+    print(proporcoes["kaggle"])
 
 
     

@@ -53,7 +53,7 @@ def cria_graficos(corpus):
     plt.ylabel('Quantidade de textos avaliados no intervalo')
     plt.xticks(fontsize=6)    
     plt.tight_layout()
-    plt.savefig(f"analise\\graficos\\{corpus}\\humanas.pdf", format="pdf" )
+    plt.savefig(f"testaNovoModelo\\{corpus}\\barrasHumanos.pdf", format="pdf" )
     
 
     plt.close()
@@ -64,7 +64,7 @@ def cria_graficos(corpus):
     plt.ylabel('Quantidade de textos avaliados no intervalo')
     plt.xticks(fontsize=6)
     plt.tight_layout()
-    plt.savefig(f"analise\\graficos\\{corpus}\\sistema.pdf", format="pdf")
+    plt.savefig(f"testaNovoModelo\\{corpus}\\barrasSistema.pdf", format="pdf")
 
     plt.close()
 
@@ -90,7 +90,7 @@ def main():
     #print(medias("kaggle")) #humana = 502.7734627831715  | sistema = 505.0129449838188
 
     cria_graficos("kaggle")
-    cria_graficos("uol")
+    #cria_graficos("uol")
 
     #print(medianas("kaggle")) #humana = 500.0 | sistema = 528.0
     #print(medianas("uol")) #humana = 500.0 | sistema = 473.0

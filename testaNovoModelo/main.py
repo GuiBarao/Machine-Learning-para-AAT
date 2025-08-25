@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 import joblib
+import matplotlib.pyplot as plt
 
 
 def divisao_features(caminho_csv):
@@ -21,6 +22,7 @@ def divisao_features(caminho_csv):
     return (x_train, x_test, y_train, y_test)
 
 def treinar_modelo_randomForest(atributos, avaliacao):
+
     modelo = RandomForestRegressor(
     n_estimators=200,
     max_depth=10,
@@ -48,8 +50,9 @@ def treinar_modelo_randomForest(atributos, avaliacao):
 
 
 def treinar_modelo_boosting(atributos, avaliacao):
+
     modelo = GradientBoostingRegressor(
-        loss="quantile",
+        loss="huber",
         learning_rate=0.04,
         n_estimators=1400,
         max_depth=4,
@@ -73,6 +76,45 @@ def criar_modelo(caminho_csv, caminho_modelo, algoritmo='random_forest'):
         joblib.dump(modelo, caminho_modelo)
         return modelo.score(x_teste, y_teste)
 
+
+
+
+def quantidade_agrupamento(avaliacoes:list, min:int, max:int) -> int:
+    return len(list(filter(lambda x: (x >= min and x <= max), avaliacoes)))
+
+def cria_graficos(corpus):
+    humanas = np.loadtxt('testaNovoModelo\\atributos\\kaggle\\geralFiltrado.csv', delimiter=',')[:, -1]
+
+    dados_graficoHumano = {
+        "0-100": quantidade_agrupamento(humanas, 0, 100),
+        "101-200": quantidade_agrupamento(humanas, 101, 200),
+        "201-300": quantidade_agrupamento(humanas, 201, 300),
+        "301-400": quantidade_agrupamento(humanas, 301, 400),
+        "401-500": quantidade_agrupamento(humanas, 401, 500),
+        "501-600": quantidade_agrupamento(humanas, 501, 600),
+        "601-700": quantidade_agrupamento(humanas, 601, 700),
+        "701-800": quantidade_agrupamento(humanas, 701, 800),
+        "801-900": quantidade_agrupamento(humanas, 801, 900),
+        "901-1000": quantidade_agrupamento(humanas, 901, 1000),
+    }
+
+
+    map_corpus = {"kaggle" : "Ensino Fundamental", "uol":"Ensino Médio"}
+
+    
+    plt.bar(list(dados_graficoHumano.keys()), list(dados_graficoHumano.values()))
+    plt.title(f'Avaliações de textos do {map_corpus[corpus]} dada por humanos')
+    plt.xlabel('Intervalo de avaliação')
+    plt.ylabel('Quantidade de textos avaliados no intervalo')
+    plt.xticks(fontsize=6)    
+    plt.tight_layout()
+    plt.savefig(f"testaNovoModelo\\{corpus}\\barrasDatasetInteiro.pdf", format="pdf" )
+    
+
+    plt.close()
+
+
+
 def main():
 
     #tipos = ["autocorrelacao_espacial", "coerencia", "dados_espaciais",
@@ -81,11 +123,11 @@ def main():
     #modelo = Modelo()
 
     #modelo.extrair_geral(tipos=tipos, corpus='kaggle')
+    #cria_graficos("kaggle")
 
-
-    print(criar_modelo("data/atributos/kaggle/geral.csv", 
-                 "modelos_treinados_boosting\\kaggle\\geral.pkl", 
-                 algoritmo="rwerwefct"))
+    print(criar_modelo("testaNovoModelo\\atributos\\kaggle\\geralFiltrado.csv", 
+                 "testaNovoModelo\\kaggle\\geral.pkl", 
+                 algoritmo="4ryewef"))
 
     
 

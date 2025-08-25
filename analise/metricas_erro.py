@@ -32,11 +32,11 @@ def cria_planilha(corpus:str):
 
     df = pd.DataFrame([dados])
 
-    df.to_excel(f"analise\\planilhas\\{corpus}\\metricas_{corpus}.xlsx")
+    df.to_excel(f"testaNovoModelo\\planilhas\\{corpus}\\metricas_{corpus}.xlsx")
 
 def main():
 
-    cria_planilha("uol")
+    #cria_planilha("uol")
     cria_planilha("kaggle")
 
 

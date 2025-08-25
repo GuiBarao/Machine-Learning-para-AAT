@@ -378,7 +378,7 @@ class Modelo:
 
         y_array_geral = y_array_geral.reshape(-1, 1)
         array_geral = np.hstack((array_geral, y_array_geral))
-        np.savetxt(f"data/atributos/{corpus}/geral.csv", array_geral,  delimiter=",", fmt="%.5f")
+        np.savetxt(f"data_boost/atributos/{corpus}/geral.csv", array_geral,  delimiter=",", fmt="%.5f")
 
 
         
